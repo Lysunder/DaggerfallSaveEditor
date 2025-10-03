@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import CharacterComponent from "./character.component";
 
 export default function CharacterTabs() {
   interface TabPanelProps {
@@ -46,16 +47,16 @@ export default function CharacterTabs() {
           onChange={handleChange}
           aria-label="basic tabs example"
         >
-          <Tab label="Item One" {...a11yProps(0)} />
-          <Tab label="Item Two" {...a11yProps(1)} />
+          <Tab label="Character" {...a11yProps(0)} />
+          <Tab label="Stats" {...a11yProps(1)} />
           <Tab label="Item Three" {...a11yProps(2)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        Item One
+        <CharacterComponent />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        Item Two
+        Stats
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
         Item Three
