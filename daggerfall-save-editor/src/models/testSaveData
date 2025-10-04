@@ -1,0 +1,510 @@
+using System;
+using System.Collections.Generic;
+
+namespace DaggerfallUnitySaveEditor.Models
+{
+    public class SaveData
+    {
+        public Header header { get; set; }
+        public int currentUID { get; set; }
+        public DateAndTime dateAndTime { get; set; }
+        public PlayerData playerData { get; set; }
+        public DungeonData dungeonData { get; set; }
+        public List<EnemyData> enemyData { get; set; }
+    }
+
+    public class Header
+    {
+        public string description { get; set; }
+        public string version { get; set; }
+    }
+
+    public class DateAndTime
+    {
+        public long gameTime { get; set; }
+        public long realTime { get; set; }
+        public string version { get; set; }
+    }
+
+    public class PlayerData
+    {
+        public PlayerPosition playerPosition { get; set; }
+        public PlayerEntity playerEntity { get; set; }
+        public bool weaponDrawn { get; set; }
+        public bool usingLeftHand { get; set; }
+        public string transportMode { get; set; }
+        public object boardShipPosition { get; set; }
+        public Dictionary<string, object> guildMemberships { get; set; }
+        public Dictionary<string, object> vampireMemberships { get; set; }
+        public object oneTimeQuestsAccepted { get; set; }
+        public string version { get; set; }
+    }
+
+    public class PlayerPosition
+    {
+        public Position position { get; set; }
+        public Position worldCompensation { get; set; }
+        public string worldContext { get; set; }
+        public int floatingOriginVersion { get; set; }
+        public float yaw { get; set; }
+        public float pitch { get; set; }
+        public bool isCrouching { get; set; }
+        public int worldPosX { get; set; }
+        public int worldPosZ { get; set; }
+        public bool insideDungeon { get; set; }
+        public bool insideBuilding { get; set; }
+        public bool insideOpenShop { get; set; }
+        public bool insideTavern { get; set; }
+        public bool insideResidence { get; set; }
+        public bool playerTeleportedIntoDungeon { get; set; }
+        public string terrainSamplerName { get; set; }
+        public int terrainSamplerVersion { get; set; }
+        public string smallerDungeonsState { get; set; }
+        public object exteriorDoors { get; set; }
+        public BuildingDiscoveryData buildingDiscoveryData { get; set; }
+        public string weather { get; set; }
+        public string version { get; set; }
+    }
+
+    public class Position
+    {
+        public float x { get; set; }
+        public float y { get; set; }
+        public float z { get; set; }
+    }
+
+    public class BuildingDiscoveryData
+    {
+        public int buildingKey { get; set; }
+        public string displayName { get; set; }
+        public string oldDisplayName { get; set; }
+        public bool isOverrideName { get; set; }
+        public int factionID { get; set; }
+        public int quality { get; set; }
+        public string buildingType { get; set; }
+        public int lastLockpickAttempt { get; set; }
+        public string customUserDisplayName { get; set; }
+    }
+
+    public class PlayerEntity
+    {
+        public string gender { get; set; }
+        public int faceIndex { get; set; }
+        public RaceTemplate raceTemplate { get; set; }
+        public CareerTemplate careerTemplate { get; set; }
+        public string reflexes { get; set; }
+        public string name { get; set; }
+        public int level { get; set; }
+        public Stats stats { get; set; }
+        public Skills skills { get; set; }
+        public Resistances resistances { get; set; }
+        public int maxHealth { get; set; }
+        public int currentHealth { get; set; }
+        public int currentFatigue { get; set; }
+        public int currentMagicka { get; set; }
+        public int currentBreath { get; set; }
+        public List<int> skillUses { get; set; }
+        public int timeOfLastSkillIncreaseCheck { get; set; }
+        public List<int> skillsRecentlyRaised { get; set; }
+        public int startingLevelUpSkillSum { get; set; }
+        public int currentLevelUpSkillSum { get; set; }
+        public List<int> equipTable { get; set; }
+        public List<Item> items { get; set; }
+        public List<Item> wagonItems { get; set; }
+        public List<Item> otherItems { get; set; }
+        public int goldPieces { get; set; }
+        public List<GlobalVar> globalVars { get; set; }
+        public string minMetalToHit { get; set; }
+        public int biographyResistDiseaseMod { get; set; }
+        public int biographyResistMagicMod { get; set; }
+        public int biographyAvoidHitMod { get; set; }
+        public int biographyResistPoisonMod { get; set; }
+        public int biographyFatigueMod { get; set; }
+        public int biographyReactionMod { get; set; }
+        public int timeForThievesGuildLetter { get; set; }
+        public int timeForDarkBrotherhoodLetter { get; set; }
+        public int thievesGuildRequirementTally { get; set; }
+        public int darkBrotherhoodRequirementTally { get; set; }
+        public int timeToBecomeVampireOrWerebeast { get; set; }
+        public int lastTimePlayerAteOrDrankAtTavern { get; set; }
+        public int timeOfLastSkillTraining { get; set; }
+        public List<RegionData> regionData { get; set; }
+        public List<object> rentedRooms { get; set; }
+        public List<SpellbookEntry> spellbook { get; set; }
+        public List<InstancedEffectBundle> instancedEffectBundles { get; set; }
+        public string crimeCommitted { get; set; }
+        public bool haveShownSurrenderToGuardsDialogue { get; set; }
+        public int lightSourceUID { get; set; }
+        public int reputationCommoners { get; set; }
+        public int reputationMerchants { get; set; }
+        public int reputationNobility { get; set; }
+        public int reputationScholars { get; set; }
+        public int reputationUnderworld { get; set; }
+        public int reputationSGroup5 { get; set; }
+        public int reputationSupernaturalBeings { get; set; }
+        public int reputationGuildMembers { get; set; }
+        public int reputationSGroup8 { get; set; }
+        public int reputationSGroup9 { get; set; }
+        public int reputationSGroup10 { get; set; }
+        public string previousVampireClan { get; set; }
+        public int daedraSummonDay { get; set; }
+        public int daedraSummonIndex { get; set; }
+        public object anchorPosition { get; set; }
+        public string version { get; set; }
+    }
+
+    public class RaceTemplate
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public int DescriptionID { get; set; }
+        public int ClipID { get; set; }
+        public string PaperDollBackground { get; set; }
+        public string PaperDollBodyMaleUnclothed { get; set; }
+        public string PaperDollBodyMaleClothed { get; set; }
+        public string PaperDollBodyFemaleUnclothed { get; set; }
+        public string PaperDollBodyFemaleClothed { get; set; }
+        public string PaperDollHeadsMale { get; set; }
+        public string PaperDollHeadsFemale { get; set; }
+        public string ResistanceFlags { get; set; }
+        public string ImmunityFlags { get; set; }
+        public string LowToleranceFlags { get; set; }
+        public string CriticalWeaknessFlags { get; set; }
+        public string SpecialAbilities { get; set; }
+        public string type { get; set; }
+    }
+
+    public class CareerTemplate
+    {
+        public string Name { get; set; }
+        public double AdvancementMultiplier { get; set; }
+        public int HitPointsPerLevel { get; set; }
+        public int Strength { get; set; }
+        public int Intelligence { get; set; }
+        public int Willpower { get; set; }
+        public int Agility { get; set; }
+        public int Endurance { get; set; }
+        public int Personality { get; set; }
+        public int Speed { get; set; }
+        public int Luck { get; set; }
+        public string PrimarySkill1 { get; set; }
+        public string PrimarySkill2 { get; set; }
+        public string PrimarySkill3 { get; set; }
+        public string MajorSkill1 { get; set; }
+        public string MajorSkill2 { get; set; }
+        public string MajorSkill3 { get; set; }
+        public string MinorSkill1 { get; set; }
+        public string MinorSkill2 { get; set; }
+        public string MinorSkill3 { get; set; }
+        public string MinorSkill4 { get; set; }
+        public string MinorSkill5 { get; set; }
+        public string MinorSkill6 { get; set; }
+        public string Paralysis { get; set; }
+        public string Magic { get; set; }
+        public string Poison { get; set; }
+        public string Fire { get; set; }
+        public string Frost { get; set; }
+        public string Shock { get; set; }
+        public string Disease { get; set; }
+        public string ShortBlades { get; set; }
+        public string LongBlades { get; set; }
+        public string HandToHand { get; set; }
+        public string Axes { get; set; }
+        public string BluntWeapons { get; set; }
+        public string MissileWeapons { get; set; }
+        public string UndeadAttackModifier { get; set; }
+        public string DaedraAttackModifier { get; set; }
+        public string HumanoidAttackModifier { get; set; }
+        public string AnimalsAttackModifier { get; set; }
+        public string DarknessPoweredMagery { get; set; }
+        public string LightPoweredMagery { get; set; }
+        public string ForbiddenMaterials { get; set; }
+        public string ForbiddenShields { get; set; }
+        public string ForbiddenArmors { get; set; }
+        public string ForbiddenProficiencies { get; set; }
+        public string ExpertProficiencies { get; set; }
+        public string SpellPointMultiplier { get; set; }
+        public double SpellPointMultiplierValue { get; set; }
+        public string SpellAbsorption { get; set; }
+        public bool NoRegenSpellPoints { get; set; }
+        public bool AcuteHearing { get; set; }
+        public bool Athleticism { get; set; }
+        public bool AdrenalineRush { get; set; }
+        public string Regeneration { get; set; }
+        public string RapidHealing { get; set; }
+        public bool DamageFromSunlight { get; set; }
+        public bool DamageFromHolyPlaces { get; set; }
+    }
+
+    public class Stats
+    {
+        public int Strength { get; set; }
+        public int Intelligence { get; set; }
+        public int Willpower { get; set; }
+        public int Agility { get; set; }
+        public int Endurance { get; set; }
+        public int Personality { get; set; }
+        public int Speed { get; set; }
+        public int Luck { get; set; }
+    }
+
+    public class Skills
+    {
+        public int Medical { get; set; }
+        public int Etiquette { get; set; }
+        public int Streetwise { get; set; }
+        public int Jumping { get; set; }
+        public int Orcish { get; set; }
+        public int Harpy { get; set; }
+        public int Giantish { get; set; }
+        public int Dragonish { get; set; }
+        public int Nymph { get; set; }
+        public int Daedric { get; set; }
+        public int Spriggan { get; set; }
+        public int Centaurian { get; set; }
+        public int Impish { get; set; }
+        public int Lockpicking { get; set; }
+        public int Mercantile { get; set; }
+        public int Pickpocket { get; set; }
+        public int Stealth { get; set; }
+        public int Swimming { get; set; }
+        public int Climbing { get; set; }
+        public int Backstabbing { get; set; }
+        public int Dodging { get; set; }
+        public int Running { get; set; }
+        public int Destruction { get; set; }
+        public int Restoration { get; set; }
+        public int Illusion { get; set; }
+        public int Alteration { get; set; }
+        public int Thaumaturgy { get; set; }
+        public int Mysticism { get; set; }
+        public int ShortBlade { get; set; }
+        public int LongBlade { get; set; }
+        public int HandToHand { get; set; }
+        public int Axe { get; set; }
+        public int BluntWeapon { get; set; }
+        public int Archery { get; set; }
+        public int CriticalStrike { get; set; }
+    }
+
+    public class Resistances
+    {
+        public int Fire { get; set; }
+        public int Frost { get; set; }
+        public int DiseaseOrPoison { get; set; }
+        public int Shock { get; set; }
+        public int Magic { get; set; }
+    }
+
+    public class Item
+    {
+        public int uid { get; set; }
+        public string shortName { get; set; }
+        public int nativeMaterialValue { get; set; }
+        public string dyeColor { get; set; }
+        public float weightInKg { get; set; }
+        public int drawOrder { get; set; }
+        public int value1 { get; set; }
+        public int value2 { get; set; }
+        public int hits1 { get; set; }
+        public int hits2 { get; set; }
+        public int hits3 { get; set; }
+        public int stackCount { get; set; }
+        public int enchantmentPoints { get; set; }
+        public int message { get; set; }
+        public object legacyMagic { get; set; }
+        public object customMagic { get; set; }
+        public int playerTextureArchive { get; set; }
+        public int playerTextureRecord { get; set; }
+        public int worldTextureArchive { get; set; }
+        public int worldTextureRecord { get; set; }
+        public string itemGroup { get; set; }
+        public int groupIndex { get; set; }
+        public int currentVariant { get; set; }
+        public bool isQuestItem { get; set; }
+        public int questUID { get; set; }
+        public string questItemSymbol { get; set; }
+        public string trappedSoulType { get; set; }
+        public string className { get; set; }
+        public string poisonType { get; set; }
+        public int potionRecipe { get; set; }
+        public object repairData { get; set; }
+        public int timeForItemToDisappear { get; set; }
+        public int timeHealthLeechLastUsed { get; set; }
+        public int artifactIndexBitfield { get; set; }
+        public string version { get; set; }
+    }
+
+    public class GlobalVar
+    {
+        public int index { get; set; }
+        public string name { get; set; }
+        public bool value { get; set; }
+    }
+
+    public class RegionData
+    {
+        public List<int> Values { get; set; }
+        public List<bool> Flags { get; set; }
+        public List<bool> Flags2 { get; set; }
+        public int LegalRep { get; set; }
+        public int PrecipitationOverride { get; set; }
+        public int SeverePunishmentFlags { get; set; }
+        public int IDOfPersecutedTemple { get; set; }
+        public int PriceAdjustment { get; set; }
+    }
+
+    public class SpellbookEntry
+    {
+        public int Version { get; set; }
+        public string BundleType { get; set; }
+        public string TargetType { get; set; }
+        public string ElementType { get; set; }
+        public string RuntimeFlags { get; set; }
+        public string Name { get; set; }
+        public int IconIndex { get; set; }
+        public Icon Icon { get; set; }
+        public bool MinimumCastingCost { get; set; }
+        public bool NoCastingAnims { get; set; }
+        public string Tag { get; set; }
+        public List<SpellEffect> Effects { get; set; }
+        public object LegacyEffects { get; set; }
+        public int StandardSpellIndex { get; set; }
+    }
+
+    public class Icon
+    {
+        public string key { get; set; }
+        public int index { get; set; }
+    }
+
+    public class SpellEffect
+    {
+        public string Key { get; set; }
+        public SpellEffectSettings Settings { get; set; }
+        public object EnchantmentParam { get; set; }
+    }
+
+    public class SpellEffectSettings
+    {
+        public int DurationBase { get; set; }
+        public int DurationPlus { get; set; }
+        public int DurationPerLevel { get; set; }
+        public int ChanceBase { get; set; }
+        public int ChancePlus { get; set; }
+        public int ChancePerLevel { get; set; }
+        public int MagnitudeBaseMin { get; set; }
+        public int MagnitudeBaseMax { get; set; }
+        public int MagnitudePlusMin { get; set; }
+        public int MagnitudePlusMax { get; set; }
+        public int MagnitudePerLevel { get; set; }
+    }
+
+    public class InstancedEffectBundle
+    {
+        public int version { get; set; }
+        public string bundleType { get; set; }
+        public string targetType { get; set; }
+        public string elementType { get; set; }
+        public string runtimeFlags { get; set; }
+        public string name { get; set; }
+        public int iconIndex { get; set; }
+        public Icon icon { get; set; }
+        public string casterEntityType { get; set; }
+        public int casterLoadID { get; set; }
+        public int fromEquippedItemID { get; set; }
+        public int castByItemID { get; set; }
+        public bool fromPoison { get; set; }
+        public List<LiveEffect> liveEffects { get; set; }
+        public string versionString { get; set; }
+    }
+
+    public class LiveEffect
+    {
+        public string key { get; set; }
+        public SpellEffectSettings effectSettings { get; set; }
+        public object enchantmentParam { get; set; }
+        public int roundsRemaining { get; set; }
+        public bool chanceSuccess { get; set; }
+        public List<int> statMods { get; set; }
+        public List<int> statMaxMods { get; set; }
+        public List<int> skillMods { get; set; }
+        public bool isIncumbent { get; set; }
+        public int variantCount { get; set; }
+        public int currentVariant { get; set; }
+        public bool effectEnded { get; set; }
+        public object effectSpecific { get; set; }
+        public string version { get; set; }
+    }
+
+    public class DungeonData
+    {
+        public List<ActionDoor> actionDoors { get; set; }
+        public List<object> actionObjects { get; set; }
+        public string version { get; set; }
+    }
+
+    public class ActionDoor
+    {
+        public int loadID { get; set; }
+        public int currentLockValue { get; set; }
+        public Rotation currentRotation { get; set; }
+        public string currentState { get; set; }
+        public float actionPercentage { get; set; }
+        public int lockpickFailedSkillLevel { get; set; }
+        public string version { get; set; }
+    }
+
+    public class Rotation
+    {
+        public float x { get; set; }
+        public float y { get; set; }
+        public float z { get; set; }
+        public float w { get; set; }
+    }
+
+    public class EnemyData
+    {
+        public int loadID { get; set; }
+        public string gameObjectName { get; set; }
+        public Position currentPosition { get; set; }
+        public Position localPosition { get; set; }
+        public Rotation currentRotation { get; set; }
+        public string worldContext { get; set; }
+        public Position worldCompensation { get; set; }
+        public bool isDead { get; set; }
+        public int startingHealth { get; set; }
+        public int currentHealth { get; set; }
+        public int currentFatigue { get; set; }
+        public int currentMagicka { get; set; }
+        public string entityType { get; set; }
+        public string careerName { get; set; }
+        public int careerIndex { get; set; }
+        public bool isHostile { get; set; }
+        public bool hasEncounteredPlayer { get; set; }
+        public bool questSpawn { get; set; }
+        public string mobileGender { get; set; }
+        public List<Item> items { get; set; }
+        public List<int> equipTable { get; set; }
+        public QuestResource questResource { get; set; }
+        public List<InstancedEffectBundle> instancedEffectBundles { get; set; }
+        public bool alliedToPlayer { get; set; }
+        public int questFoeSpellQueueIndex { get; set; }
+        public int questFoeItemQueueIndex { get; set; }
+        public bool wabbajackActive { get; set; }
+        public int team { get; set; }
+        public bool specialTransformationCompleted { get; set; }
+        public string version { get; set; }
+    }
+
+    public class QuestResource
+    {
+        public int questUID { get; set; }
+        public string targetSymbol { get; set; }
+        public bool isFoeDead { get; set; }
+        public int foeSpellQueuePosition { get; set; }
+        public int foeItemQueuePosition { get; set; }
+        public bool isAttackableByAI { get; set; }
+        public string version { get; set; }
+    }
+}
