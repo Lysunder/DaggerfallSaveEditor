@@ -1,9 +1,18 @@
-// import React, { useEffect } from 'react'
 import { useEffect } from 'react'
 import { useRecoilState } from 'recoil'
+import { ThemeProvider, createTheme } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 import { saveDataState, filePathState } from './state'
 import { InitialView } from './components/InitialView'
 import { EditorView } from './components/EditorView'
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
 function App() {
   const [saveData, setSaveData] = useRecoilState(saveDataState);
@@ -45,12 +54,26 @@ function App() {
   }, [saveData, filePath, setSaveData, setFilePath]);
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif', height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <h2>Daggerfall Save Editor</h2>
-      {filePath && <p style={{ color: '#666', fontSize: '0.9em' }}>Editing: {filePath}</p>}
-      
-      {!saveData ? <InitialView /> : <EditorView />}
-    </div>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <Box sx={{ 
+        padding: '20px', 
+        height: '100vh', 
+        display: 'flex', 
+        flexDirection: 'column' 
+      }}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Daggerfall Save Editor
+        </Typography>
+        {filePath && (
+          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
+            Editing: {filePath}
+          </Typography>
+        )}
+        
+        {!saveData ? <InitialView /> : <EditorView />}
+      </Box>
+    </ThemeProvider>
   )
 }
 
