@@ -1,80 +1,41 @@
-import { useEffect } from 'react'
-import { useRecoilState } from 'recoil'
-import { ThemeProvider, createTheme } from '@mui/material/styles'
-import CssBaseline from '@mui/material/CssBaseline'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import { saveDataState, filePathState } from './state'
-import { InitialView } from './components/InitialView'
-import { EditorView } from './components/EditorView'
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { HashRouter, Routes, Route } from 'react-router-dom';
+import MainLayout from './layout/MainLayout';
+import Home from './pages/Home';
+import Inventory from './pages/Inventory';
+
+import GlobalVars from './pages/GlobalVars';
+import { NotificationProvider } from './context/NotificationContext';
 
 const darkTheme = createTheme({
   palette: {
     mode: 'dark',
+    primary: {
+      main: '#90caf9',
+    },
+    secondary: {
+      main: '#f48fb1',
+    },
   },
 });
 
 function App() {
-  const [saveData, setSaveData] = useRecoilState(saveDataState);
-  const [filePath, setFilePath] = useRecoilState(filePathState);
-
-  useEffect(() => {
-    // Listen for file opened
-    // @ts-ignore
-    window.ipcRenderer.onOpen(({ path, content }) => {
-      try {
-        const json = JSON.parse(content);
-        setSaveData(json);
-        setFilePath(path);
-      } catch (e) {
-        console.error('Failed to parse JSON', e);
-        alert('Failed to parse JSON file');
-      }
-    });
-
-    // Listen for save request
-    // @ts-ignore
-    window.ipcRenderer.onSaveRequest(() => {
-       if (saveData) {
-         const content = JSON.stringify(saveData, null, 4);
-         // @ts-ignore
-         window.ipcRenderer.saveContent(filePath, content);
-       } else {
-         alert('No data to save!');
-       }
-    });
-    
-    // Listen for save confirmation
-    // @ts-ignore
-    window.ipcRenderer.onSaved(({ path }) => {
-        setFilePath(path);
-        alert('File saved successfully!');
-    });
-
-  }, [saveData, filePath, setSaveData, setFilePath]);
-
   return (
     <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <Box sx={{ 
-        padding: '20px', 
-        height: '100vh', 
-        display: 'flex', 
-        flexDirection: 'column' 
-      }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Daggerfall Save Editor
-        </Typography>
-        {filePath && (
-          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
-            Editing: {filePath}
-          </Typography>
-        )}
-        
-        {!saveData ? <InitialView /> : <EditorView />}
-      </Box>
+      <NotificationProvider>
+        <HashRouter>
+          <Routes>
+            <Route path="/" element={<MainLayout />}>
+              <Route index element={<Home />} />
+              <Route path="inventory" element={<Inventory />} />
+
+              <Route path="globals" element={<GlobalVars />} />
+            </Route>
+          </Routes>
+        </HashRouter>
+      </NotificationProvider>
     </ThemeProvider>
-  )
+  );
 }
 
-export default App
+export default App;

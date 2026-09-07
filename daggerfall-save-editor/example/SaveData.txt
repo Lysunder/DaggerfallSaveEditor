@@ -5,8 +5,8 @@
     },
     "currentUID": 33554892,
     "dateAndTime": {
-        "gameTime": 12599766960,
-        "realTime": 638960818208072759,
+        "gameTime": 12599766976,
+        "realTime": 639243730365751703,
         "$version": "v1"
     },
     "playerData": {
@@ -23,8 +23,8 @@
             },
             "worldContext": "Interior",
             "floatingOriginVersion": 3,
-            "yaw": 179.5023,
-            "pitch": 16.69994,
+            "yaw": 185.3024,
+            "pitch": 6.700006,
             "isCrouching": false,
             "worldPosX": 6789052,
             "worldPosZ": 9383317,

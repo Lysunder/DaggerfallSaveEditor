@@ -1,6 +1,9 @@
-import { app, BrowserWindow, Menu, dialog, ipcMain } from 'electron'
-import path from 'node:path'
-import fs from 'node:fs'
+import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import path from 'node:path';
+import fs from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // The built directory structure
 //
@@ -11,106 +14,82 @@ import fs from 'node:fs'
 // │ │ ├── main.js
 // │ │ └── preload.js
 // │
-process.env.DIST = path.join(__dirname, '../dist')
-process.env.VITE_PUBLIC = app.isPackaged ? process.env.DIST : path.join(__dirname, '../public')
+process.env.DIST = path.join(__dirname, '../dist');
+process.env.VITE_PUBLIC = app.isPackaged ? process.env.DIST : path.join(process.env.DIST, '../public');
 
-let win: BrowserWindow | null
-
-// 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
-const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
+let win: BrowserWindow | null;
+const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
 
 function createWindow() {
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC as string, 'electron-vite.svg'),
+    width: 1200,
+    height: 800,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
-  })
+  });
 
   // Test active push message to Renderer-process.
   win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', (new Date).toLocaleString())
-  })
+    win?.webContents.send('main-process-message', (new Date).toLocaleString());
+  });
+
+  win.webContents.on('console-message', (event, level, message, line, sourceId) => {
+    console.log(`[Renderer]: ${message} (at ${sourceId}:${line})`);
+  });
 
   if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL)
+    win.loadURL(VITE_DEV_SERVER_URL);
+    // Open devTools automatically in development
+    win.webContents.openDevTools();
   } else {
     // win.loadFile('dist/index.html')
-    win.loadFile(path.join(process.env.DIST as string, 'index.html'))
+    win.loadFile(path.join(process.env.DIST as string, 'index.html'));
   }
 }
 
-// Menu Definition
-const createMenu = () => {
-  const template: Electron.MenuItemConstructorOptions[] = [
-    {
-      label: 'File',
-      submenu: [
-        {
-          label: 'Open',
-          click: async () => {
-            if (!win) return
-            const { canceled, filePaths } = await dialog.showOpenDialog(win, {
-              properties: ['openFile'],
-              filters: [{ name: 'JSON', extensions: ['json', 'txt'] }],
-            })
-            if (!canceled && filePaths.length > 0) {
-              const content = await fs.promises.readFile(filePaths[0], 'utf-8')
-              win.webContents.send('file:opened', { path: filePaths[0], content })
-            }
-          }
-        },
-        {
-          label: 'Save',
-          click: () => {
-             win?.webContents.send('file:request-save')
-          }
-        },
-        { type: 'separator' },
-        {
-          label: 'Exit',
-          click: () => {
-            app.quit()
-          }
-        }
-      ]
+// IPC Handlers
+ipcMain.handle('dialog:openSaveData', async () => {
+  const { canceled, filePaths } = await dialog.showOpenDialog(win!, {
+    properties: ['openFile'],
+    filters: [{ name: 'Saves', extensions: ['txt', 'json'] }]
+  });
+  if (!canceled && filePaths.length > 0) {
+    try {
+      const filePath = filePaths[0];
+      const rawData = await fs.readFile(filePath, 'utf-8');
+      const parsedData = JSON.parse(rawData);
+      return { success: true, filePath, data: parsedData };
+    } catch (error: any) {
+      return { success: false, error: error.message };
     }
-  ]
-
-  const menu = Menu.buildFromTemplate(template)
-  Menu.setApplicationMenu(menu)
-}
-
-ipcMain.on('file:save-content', async (_event, { path: filePath, content }) => {
-  if (!win) return
-  
-  let targetPath = filePath
-  if (!targetPath) {
-    const { canceled, filePath: savePath } = await dialog.showSaveDialog(win, {
-      filters: [{ name: 'JSON', extensions: ['json', 'txt'] }],
-    })
-    if (canceled || !savePath) return
-    targetPath = savePath
   }
+  return { success: false, canceled: true };
+});
 
-  await fs.promises.writeFile(targetPath, content, 'utf-8')
-  win.webContents.send('file:saved', { path: targetPath })
-})
+ipcMain.handle('fs:saveData', async (_event, filePath: string, data: any) => {
+  try {
+    const rawData = JSON.stringify(data, null, 2);
+    await fs.writeFile(filePath, rawData, 'utf-8');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+});
 
-
+// App events
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
+    app.quit();
+    win = null;
   }
-})
+});
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
+    createWindow();
   }
-})
+});
 
-app.whenReady().then(() => {
-    createMenu()
-    createWindow()
-})
+app.whenReady().then(createWindow);
