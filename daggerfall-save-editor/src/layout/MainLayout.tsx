@@ -1,11 +1,11 @@
 import { Box, Drawer, AppBar, CssBaseline, Toolbar, List, Typography, Divider, ListItem, ListItemButton, ListItemIcon, ListItemText, Button } from '@mui/material';
 import { Outlet, useNavigate } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
-import InventoryIcon from '@mui/icons-material/Inventory';
+//import InventoryIcon from '@mui/icons-material/Inventory';
 
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import SaveIcon from '@mui/icons-material/Save';
-import PublicIcon from '@mui/icons-material/Public';
+
 import { useSaveStore } from '../store/useSaveStore';
 import { useNotification } from '../context/NotificationContext';
 
@@ -85,23 +85,16 @@ export default function MainLayout() {
                 <ListItemText primary="Character Stats" />
               </ListItemButton>
             </ListItem>
-            <ListItem disablePadding>
+            {/* <ListItem disablePadding>
               <ListItemButton onClick={() => navigate('/inventory')}>
                 <ListItemIcon>
                   <InventoryIcon />
                 </ListItemIcon>
                 <ListItemText primary="Inventory" />
               </ListItemButton>
-            </ListItem>
+            </ListItem> */}
 
-            <ListItem disablePadding>
-              <ListItemButton onClick={() => navigate('/globals')}>
-                <ListItemIcon>
-                  <PublicIcon />
-                </ListItemIcon>
-                <ListItemText primary="Global Variables" />
-              </ListItemButton>
-            </ListItem>
+
           </List>
           <Divider />
         </Box>

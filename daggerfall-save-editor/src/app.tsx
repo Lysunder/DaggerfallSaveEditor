@@ -4,7 +4,7 @@ import MainLayout from './layout/MainLayout';
 import Home from './pages/Home';
 import Inventory from './pages/Inventory';
 
-import GlobalVars from './pages/GlobalVars';
+
 import { NotificationProvider } from './context/NotificationContext';
 
 const darkTheme = createTheme({
@@ -29,7 +29,7 @@ function App() {
               <Route index element={<Home />} />
               <Route path="inventory" element={<Inventory />} />
 
-              <Route path="globals" element={<GlobalVars />} />
+
             </Route>
           </Routes>
         </HashRouter>

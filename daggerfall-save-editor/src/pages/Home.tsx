@@ -4,6 +4,7 @@ import { CharacterBasics } from '../components/CharacterBasics';
 import { StatsAndSkills } from '../components/StatsAndSkills';
 import { InventoryManager } from '../components/InventoryManager';
 import { FinancesAndBanking } from '../components/FinancesAndBanking';
+import { QuestProgress } from '../components/QuestProgress';
 
 export default function Home() {
   const saveData = useSaveStore((state) => state.saveData);
@@ -43,6 +44,11 @@ export default function Home() {
         {/* Finances & Banking */}
         <Grid size={{ xs: 12 }}>
           <FinancesAndBanking />
+        </Grid>
+
+        {/* Quest Progress & Global Flags */}
+        <Grid size={{ xs: 12 }}>
+          <QuestProgress />
         </Grid>
       </Grid>
     </Box>
