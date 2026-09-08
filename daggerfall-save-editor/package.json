@@ -1,11 +1,13 @@
 {
   "name": "daggerfall-save-editor",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:pack": "electron-builder --dir",
+    "build:dist": "electron-builder",
     "lint": "oxlint",
     "preview": "vite preview"
   },

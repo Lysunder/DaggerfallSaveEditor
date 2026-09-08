@@ -1,0 +1,20 @@
+appId: com.daggerfall.saveeditor
+productName: Daggerfall Unity Save Editor
+
+directories:
+  output: release/
+  buildResources: build
+
+win:
+  target:
+    - nsis
+    - portable
+  icon: build/icon.ico
+
+mac:
+  target:
+    - dmg
+
+linux:
+  target:
+    - AppImage
