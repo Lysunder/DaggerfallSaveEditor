@@ -1,7 +1,5 @@
-import { Box, Drawer, AppBar, CssBaseline, Toolbar, List, Typography, Divider, ListItem, ListItemButton, ListItemIcon, ListItemText, Button } from '@mui/material';
-import { Outlet, useNavigate } from 'react-router-dom';
-import PersonIcon from '@mui/icons-material/Person';
-//import InventoryIcon from '@mui/icons-material/Inventory';
+import { Box, AppBar, CssBaseline, Toolbar, Typography, Button } from '@mui/material';
+import { Outlet } from 'react-router-dom';
 
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import SaveIcon from '@mui/icons-material/Save';
@@ -9,10 +7,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import { useSaveStore } from '../store/useSaveStore';
 import { useNotification } from '../context/NotificationContext';
 
-const drawerWidth = 240;
-
 export default function MainLayout() {
-  const navigate = useNavigate();
   const currentFilePath = useSaveStore((state) => state.currentFilePath);
   const saveData = useSaveStore((state) => state.saveData);
   const loadSaveData = useSaveStore((state) => state.loadSaveData);
@@ -66,39 +61,6 @@ export default function MainLayout() {
           </Button>
         </Toolbar>
       </AppBar>
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
-        }}
-      >
-        <Toolbar />
-        <Box sx={{ overflow: 'auto' }}>
-          <List>
-            <ListItem disablePadding>
-              <ListItemButton onClick={() => navigate('/')}>
-                <ListItemIcon>
-                  <PersonIcon />
-                </ListItemIcon>
-                <ListItemText primary="Character Stats" />
-              </ListItemButton>
-            </ListItem>
-            {/* <ListItem disablePadding>
-              <ListItemButton onClick={() => navigate('/inventory')}>
-                <ListItemIcon>
-                  <InventoryIcon />
-                </ListItemIcon>
-                <ListItemText primary="Inventory" />
-              </ListItemButton>
-            </ListItem> */}
-
-
-          </List>
-          <Divider />
-        </Box>
-      </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Toolbar />
         <Outlet />

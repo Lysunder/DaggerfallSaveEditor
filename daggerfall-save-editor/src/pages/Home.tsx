@@ -5,6 +5,8 @@ import { StatsAndSkills } from '../components/StatsAndSkills';
 import { InventoryManager } from '../components/InventoryManager';
 import { FinancesAndBanking } from '../components/FinancesAndBanking';
 import { QuestProgress } from '../components/QuestProgress';
+import { FactionsAndReputation } from '../components/FactionsAndReputation';
+import { LocationAndWorldData } from '../components/LocationAndWorldData';
 
 export default function Home() {
   const saveData = useSaveStore((state) => state.saveData);
@@ -46,9 +48,19 @@ export default function Home() {
           <FinancesAndBanking />
         </Grid>
 
+        {/* Factions & Reputation */}
+        <Grid size={{ xs: 12 }}>
+          <FactionsAndReputation />
+        </Grid>
+
         {/* Quest Progress & Global Flags */}
         <Grid size={{ xs: 12 }}>
           <QuestProgress />
+        </Grid>
+
+        {/* Location & World Data */}
+        <Grid size={{ xs: 12 }}>
+          <LocationAndWorldData />
         </Grid>
       </Grid>
     </Box>

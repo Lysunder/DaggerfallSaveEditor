@@ -90,6 +90,15 @@ interface PlayerEntity {
   wagonItems?: Item[];
   equipTable?: number[];
   globalVars: GlobalVar[];
+  reputationCommoners?: number;
+  reputationMerchants?: number;
+  reputationNobility?: number;
+  reputationScholars?: number;
+  reputationUnderworld?: number;
+  reputationSupernaturalBeings?: number;
+  reputationGuildMembers?: number;
+  guildMemberships?: { Key: number; Value: { rank: number; [key: string]: any } }[];
+  vampireMemberships?: any[];
   [key: string]: any;
 }
 
@@ -100,11 +109,36 @@ interface SaveGameData {
   };
   playerData: {
     playerEntity: PlayerEntity;
+    playerPosition?: {
+      position: { x: number; y: number; z: number };
+      yaw: number;
+      pitch: number;
+      worldPosX: number;
+      worldPosZ: number;
+      weather: number;
+      insideDungeon: boolean;
+      insideBuilding: boolean;
+      insideTavern: boolean;
+      insideResidence: boolean;
+      worldContext: number;
+      buildingDiscoveryData?: {
+        displayName?: string;
+        buildingType?: number;
+        quality?: number;
+        [key: string]: any;
+      };
+      [key: string]: any;
+    };
+    [key: string]: any;
   };
   bankAccounts: BankAccount[];
   bankDeeds?: {
     shipType: number;
     houses: any[];
+    [key: string]: any;
+  };
+  dateAndTime?: {
+    gameTime: number;
     [key: string]: any;
   };
   [key: string]: any;
@@ -124,6 +158,11 @@ interface SaveStore {
   repairAllItems: (target: 'items' | 'wagonItems') => void;
   updateGlobalVar: (name: string, value: boolean) => void;
   updateBankAccount: (regionIndex: number, updates: Partial<BankAccount>) => void;
+  updateGuildRank: (factionId: number, newRank: number) => void;
+  updatePlayerPosition: (updates: Partial<any>) => void;
+  updatePlayerPositionCoords: (coords: Partial<{x: number, y: number, z: number}>) => void;
+  updateBuildingDiscoveryData: (updates: Partial<any>) => void;
+  updateGameTime: (deltaTick: number) => void;
   reset: () => void;
 }
 
@@ -237,6 +276,49 @@ export const useSaveStore = create<SaveStore>()(
           if (account) {
             Object.assign(account, updates);
           }
+        }
+      }),
+
+    updateGuildRank: (factionId, newRank) =>
+      set((state) => {
+        const memberships = state.saveData?.playerData?.playerEntity?.guildMemberships;
+        if (memberships) {
+          const membership = memberships.find((m: any) => m.Key === factionId);
+          if (membership && membership.Value) {
+            membership.Value.rank = newRank;
+          }
+        }
+      }),
+
+    updatePlayerPosition: (updates) =>
+      set((state) => {
+        if (state.saveData?.playerData?.playerPosition) {
+          Object.assign(state.saveData.playerData.playerPosition, updates);
+        }
+      }),
+
+    updatePlayerPositionCoords: (coords) =>
+      set((state) => {
+        if (state.saveData?.playerData?.playerPosition?.position) {
+          Object.assign(state.saveData.playerData.playerPosition.position, coords);
+        }
+      }),
+
+    updateBuildingDiscoveryData: (updates) =>
+      set((state) => {
+        const playerPos = state.saveData?.playerData?.playerPosition;
+        if (playerPos) {
+          if (!playerPos.buildingDiscoveryData) {
+            playerPos.buildingDiscoveryData = {};
+          }
+          Object.assign(playerPos.buildingDiscoveryData, updates);
+        }
+      }),
+
+    updateGameTime: (deltaTick) =>
+      set((state) => {
+        if (state.saveData?.dateAndTime) {
+          state.saveData.dateAndTime.gameTime += deltaTick;
         }
       }),
 
