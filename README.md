@@ -1,32 +1,62 @@
-# React + TypeScript + Vite
+# Daggerfall Save Editor
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A desktop application for editing save files from The Elder Scrolls II: Daggerfall.
 
-Currently, two official plugins are available:
+## Features (Planned)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Edit character stats, skills, and attributes
+- Modify inventory items, gold, and spells
+- Tweak quest variables and progress
+- Change faction reputations
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+This project is built using:
 
-## Expanding the Oxlint configuration
+- **Electron** for the desktop application framework
+- **React 19** + **TypeScript** for the user interface
+- **Vite** as the build tool and development server
+- **Material UI (MUI)** for UI components and styling
+- **Zustand** for state management
+- **Immer** for immutable state updates
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## Getting Started
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (latest LTS recommended)
+- npm or yarn
+
+### Installation
+
+Clone the repository and install the dependencies:
+
+```bash
+npm install
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+### Development
+
+Start the development server with hot module replacement (HMR):
+
+```bash
+npm run dev
+```
+
+### Building for Production
+
+To build the application for production:
+
+```bash
+npm run build
+```
+
+To create a distributable package for your operating system:
+
+```bash
+npm run build:dist
+```
+
+## License
+
+This project is open-source. Please see the LICENSE file for details.
