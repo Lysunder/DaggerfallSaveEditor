@@ -24,6 +24,15 @@ const WORLD_CONTEXT_OPTIONS = [
   { value: 3, label: 'Dungeon' }
 ];
 
+const resolveEnum = (val: any, options: { value: number, label: string }[], fallback: number) => {
+  if (typeof val === 'string') {
+    // Attempt to match the label
+    const opt = options.find(o => o.label.toLowerCase() === val.toLowerCase() || o.label.split(' / ')[0].toLowerCase() === val.toLowerCase());
+    if (opt) return opt.value;
+  }
+  return typeof val === 'number' ? val : fallback;
+};
+
 export const LocationAndWorldData = () => {
   const saveData = useSaveStore((state) => state.saveData);
   const updatePlayerPosition = useSaveStore((state) => state.updatePlayerPosition);
@@ -154,7 +163,7 @@ export const LocationAndWorldData = () => {
               <InputLabel id="weather-select-label">Weather</InputLabel>
               <Select
                 labelId="weather-select-label"
-                value={playerPosition.weather ?? 0}
+                value={resolveEnum(playerPosition.weather, WEATHER_OPTIONS, 0)}
                 label="Weather"
                 onChange={(e) => updatePlayerPosition({ weather: Number(e.target.value) })}
               >
@@ -168,7 +177,7 @@ export const LocationAndWorldData = () => {
               <InputLabel id="world-context-label">World Context</InputLabel>
               <Select
                 labelId="world-context-label"
-                value={playerPosition.worldContext ?? 1}
+                value={resolveEnum(playerPosition.worldContext, WORLD_CONTEXT_OPTIONS, 1)}
                 label="World Context"
                 onChange={(e) => updatePlayerPosition({ worldContext: Number(e.target.value) })}
               >
@@ -230,19 +239,23 @@ export const LocationAndWorldData = () => {
             <Stack direction="row" spacing={2}>
               <TextField
                 label="Building Type"
-                type="number"
                 size="small"
                 fullWidth
                 value={playerPosition.buildingDiscoveryData?.buildingType ?? 0}
-                onChange={(e) => updateBuildingDiscoveryData({ buildingType: parseInt(e.target.value) })}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  updateBuildingDiscoveryData({ buildingType: isNaN(Number(val)) ? val : Number(val) });
+                }}
               />
               <TextField
                 label="Quality"
-                type="number"
                 size="small"
                 fullWidth
                 value={playerPosition.buildingDiscoveryData?.quality ?? 0}
-                onChange={(e) => updateBuildingDiscoveryData({ quality: parseInt(e.target.value) })}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  updateBuildingDiscoveryData({ quality: isNaN(Number(val)) ? val : Number(val) });
+                }}
               />
             </Stack>
           </Box>
@@ -285,3 +298,4 @@ export const LocationAndWorldData = () => {
     </Paper>
   );
 };
+
