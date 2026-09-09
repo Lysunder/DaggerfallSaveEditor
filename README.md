@@ -2,7 +2,7 @@
 
 A desktop application for editing save files from The Elder Scrolls II: Daggerfall.
 
-## Features (Planned)
+## Features
 
 - Edit character stats, skills, and attributes
 - Modify inventory items, gold, and spells
