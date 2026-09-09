@@ -60,7 +60,19 @@ ipcMain.handle('dialog:openSaveData', async () => {
       const filePath = filePaths[0];
       const rawData = await fs.readFile(filePath, 'utf-8');
       const parsedData = JSON.parse(rawData);
-      return { success: true, filePath, data: parsedData };
+
+      // Check for FactionData.txt
+      let factionData = null;
+      const dirPath = path.dirname(filePath);
+      const factionFilePath = path.join(dirPath, 'FactionData.txt');
+      try {
+        const factionRaw = await fs.readFile(factionFilePath, 'utf-8');
+        factionData = JSON.parse(factionRaw);
+      } catch (err) {
+        // Ignore if FactionData.txt does not exist
+      }
+
+      return { success: true, filePath, data: parsedData, factionData };
     } catch (error: any) {
       return { success: false, error: error.message };
     }
@@ -68,10 +80,18 @@ ipcMain.handle('dialog:openSaveData', async () => {
   return { success: false, canceled: true };
 });
 
-ipcMain.handle('fs:saveData', async (_event, filePath: string, data: any) => {
+ipcMain.handle('fs:saveData', async (_event, filePath: string, data: any, factionData?: any) => {
   try {
     const rawData = JSON.stringify(data, null, 2);
     await fs.writeFile(filePath, rawData, 'utf-8');
+
+    if (factionData) {
+      const dirPath = path.dirname(filePath);
+      const factionFilePath = path.join(dirPath, 'FactionData.txt');
+      const rawFactionData = JSON.stringify(factionData, null, 2);
+      await fs.writeFile(factionFilePath, rawFactionData, 'utf-8');
+    }
+
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };

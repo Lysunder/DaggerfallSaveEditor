@@ -17,7 +17,7 @@ export default function MainLayout() {
     try {
       const result = await window.ipcRenderer.openSaveData();
       if (result.success && result.filePath && result.data) {
-        loadSaveData(result.filePath, result.data);
+        loadSaveData(result.filePath, result.data, result.factionData);
         showNotification(`Successfully loaded ${result.filePath}`, 'success');
       } else if (!result.success && !result.canceled) {
         showNotification(`Failed to open save data: ${result.error}`, 'error');
@@ -31,7 +31,8 @@ export default function MainLayout() {
     if (!currentFilePath || !saveData) return;
     
     try {
-      const result = await window.ipcRenderer.saveData(currentFilePath, saveData);
+      const factionData = useSaveStore.getState().factionData;
+      const result = await window.ipcRenderer.saveData(currentFilePath, saveData, factionData);
       if (result.success) {
         showNotification('Save data written successfully!', 'success');
       } else {

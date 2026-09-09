@@ -21,5 +21,5 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 
   // Specific API for our app
   openSaveData: () => ipcRenderer.invoke('dialog:openSaveData'),
-  saveData: (filePath: string, data: any) => ipcRenderer.invoke('fs:saveData', filePath, data),
+  saveData: (filePath: string, data: any, factionData?: any) => ipcRenderer.invoke('fs:saveData', filePath, data, factionData),
 });
