@@ -97,8 +97,6 @@ interface PlayerEntity {
   reputationUnderworld?: number;
   reputationSupernaturalBeings?: number;
   reputationGuildMembers?: number;
-  guildMemberships?: { Key: number; Value: { rank: number; [key: string]: any } }[];
-  vampireMemberships?: any[];
   [key: string]: any;
 }
 
@@ -129,6 +127,8 @@ interface SaveGameData {
       };
       [key: string]: any;
     };
+    guildMemberships?: { Key: number; Value: { rank: number; [key: string]: any } }[];
+    vampireMemberships?: any[];
     [key: string]: any;
   };
   bankAccounts: BankAccount[];
@@ -146,8 +146,9 @@ interface SaveGameData {
 
 interface SaveStore {
   saveData: SaveGameData | null;
+  factionData: any | null;
   currentFilePath: string | null;
-  loadSaveData: (path: string, data: SaveGameData) => void;
+  loadSaveData: (path: string, data: SaveGameData, factionData?: any) => void;
   updatePlayerField: (field: keyof Omit<PlayerEntity, 'stats' | 'skills'>, value: number | string) => void;
   updateStat: (stat: keyof Stats, value: number) => void;
   updateSkill: (skill: keyof Skills | string, value: number) => void;
@@ -169,12 +170,14 @@ interface SaveStore {
 export const useSaveStore = create<SaveStore>()(
   immer((set) => ({
     saveData: null,
+    factionData: null,
     currentFilePath: null,
 
-    loadSaveData: (path, data) =>
+    loadSaveData: (path, data, factionData) =>
       set((state) => {
         state.currentFilePath = path;
         state.saveData = data;
+        state.factionData = factionData || null;
       }),
 
     updatePlayerField: (field, value) =>
@@ -281,7 +284,7 @@ export const useSaveStore = create<SaveStore>()(
 
     updateGuildRank: (factionId, newRank) =>
       set((state) => {
-        const memberships = state.saveData?.playerData?.playerEntity?.guildMemberships;
+        const memberships = state.saveData?.playerData?.guildMemberships;
         if (memberships) {
           const membership = memberships.find((m: any) => m.Key === factionId);
           if (membership && membership.Value) {
@@ -325,6 +328,7 @@ export const useSaveStore = create<SaveStore>()(
     reset: () =>
       set((state) => {
         state.saveData = null;
+        state.factionData = null;
         state.currentFilePath = null;
       }),
   }))

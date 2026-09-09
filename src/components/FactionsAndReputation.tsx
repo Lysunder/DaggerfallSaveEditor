@@ -38,8 +38,24 @@ const SOCIAL_GROUPS = [
   { key: 'reputationGuildMembers', label: 'Guild Members' },
 ];
 
+const resolveFactionId = (guildGroup: number, variant: number): number => {
+  if (guildGroup === 9) return variant; // KnightlyOrder
+  if (guildGroup === 17) return variant; // HolyOrder
+  
+  // Basic GuildGroups -> FactionID mapping based on Daggerfall Unity source
+  switch (guildGroup) {
+    case 3: return 108; // Dark Brotherhood
+    case 4: return 42; // Thieves Guild
+    case 10: return 40; // Mages Guild
+    case 11: return 41; // Fighters Guild
+  }
+  
+  return variant || guildGroup;
+};
+
 export const FactionsAndReputation = () => {
   const saveData = useSaveStore((state) => state.saveData);
+  const factionData = useSaveStore((state) => state.factionData);
   const updatePlayerField = useSaveStore((state) => state.updatePlayerField);
   const updateGuildRank = useSaveStore((state) => state.updateGuildRank);
 
@@ -48,12 +64,24 @@ export const FactionsAndReputation = () => {
   }
 
   const { playerEntity } = saveData.playerData;
-  const memberships = playerEntity.guildMemberships || [];
-  const vampireMemberships = playerEntity.vampireMemberships || [];
+  const memberships = saveData.playerData.guildMemberships || [];
+  const vampireMemberships = saveData.playerData.vampireMemberships || [];
 
   const handleReputationChange = (key: string, value: number | number[]) => {
     updatePlayerField(key as any, value as number);
   };
+
+  const dynamicFactions = React.useMemo(() => {
+    const dict: Record<number, string> = {};
+    if (factionData?.factionDict && Array.isArray(factionData.factionDict)) {
+      factionData.factionDict.forEach((item: any) => {
+        if (item.Key !== undefined && item.Value?.name) {
+          dict[item.Key] = item.Value.name;
+        }
+      });
+    }
+    return dict;
+  }, [factionData]);
 
   return (
     <Paper sx={{ p: 3, borderRadius: 2, display: 'flex', flexDirection: 'column', backgroundImage: 'linear-gradient(rgba(103, 58, 183, 0.05), rgba(255, 255, 255, 0))' }}>
@@ -117,24 +145,26 @@ export const FactionsAndReputation = () => {
           ) : (
             <List disablePadding>
               {memberships.map((membership: any, index: number) => {
-                const factionId = membership.Key;
-                const guildName = FACTION_NAMES[factionId] || `Unknown Faction (ID: ${factionId})`;
+                const guildGroupId = membership.Key;
+                const variant = membership.Value?.variant ?? 0;
+                const factionId = resolveFactionId(guildGroupId, variant);
+                const guildName = dynamicFactions[factionId] || FACTION_NAMES[factionId] || `Unknown Faction (Group: ${guildGroupId}, ID: ${factionId})`;
                 const rank = membership.Value?.rank ?? 0;
 
                 return (
-                  <React.Fragment key={factionId}>
+                  <React.Fragment key={guildGroupId}>
                     <ListItem sx={{ py: 1.5, px: 0, display: 'flex', justifyContent: 'space-between' }}>
                       <ListItemText 
                         primary={guildName}
                         secondary={`Faction ID: ${factionId}`}
                       />
                       <FormControl size="small" sx={{ minWidth: 140 }}>
-                        <InputLabel id={`rank-label-${factionId}`}>Guild Rank</InputLabel>
+                        <InputLabel id={`rank-label-${guildGroupId}`}>Guild Rank</InputLabel>
                         <Select
-                          labelId={`rank-label-${factionId}`}
+                          labelId={`rank-label-${guildGroupId}`}
                           value={rank}
                           label="Guild Rank"
-                          onChange={(e) => updateGuildRank(factionId, Number(e.target.value))}
+                          onChange={(e) => updateGuildRank(guildGroupId, Number(e.target.value))}
                         >
                           {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((r) => (
                             <MenuItem key={r} value={r}>
