@@ -29,8 +29,16 @@ jobs:
       - name: Build frontend
         run: npm run build
 
-      - name: Build and package
+      - name: Build and package (Push)
+        if: github.event_name != 'release'
         run: npm run build:dist
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build, package and publish (Release)
+        if: github.event_name == 'release'
+        run: npm run build:dist -- -p always
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

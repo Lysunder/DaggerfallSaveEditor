@@ -1,7 +1,8 @@
 {
   "name": "daggerfall-save-editor",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "repository": "Lysunder/DaggerfallSaveEditor",
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
