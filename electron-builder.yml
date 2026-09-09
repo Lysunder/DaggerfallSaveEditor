@@ -14,7 +14,9 @@ win:
 mac:
   target:
     - dmg
+  icon: build/icon.svg
 
 linux:
   target:
     - AppImage
+  icon: build/icon.svg
