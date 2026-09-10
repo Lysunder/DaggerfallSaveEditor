@@ -82,14 +82,49 @@ ipcMain.handle('dialog:openSaveData', async () => {
   return { success: false, canceled: true };
 });
 
+async function backupFile(filePath: string) {
+  try {
+    await fs.access(filePath);
+    const parsedPath = path.parse(filePath);
+    
+    const files = await fs.readdir(parsedPath.dir);
+    
+    const escapedName = parsedPath.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const escapedExt = parsedPath.ext.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const backupRegex = new RegExp(`^bak_${escapedName}\\.(\\d+)${escapedExt}$`);
+    
+    let maxIndex = -1;
+    for (const file of files) {
+      const match = file.match(backupRegex);
+      if (match) {
+        const index = parseInt(match[1], 10);
+        if (index > maxIndex) {
+          maxIndex = index;
+        }
+      }
+    }
+    
+    const nextIndex = maxIndex + 1;
+    const backupPath = path.join(parsedPath.dir, `bak_${parsedPath.name}.${nextIndex}${parsedPath.ext}`);
+    await fs.copyFile(filePath, backupPath);
+  } catch {
+    // File doesn't exist, no need to backup
+  }
+}
+
 ipcMain.handle('fs:saveData', async (_event, filePath: string, data: any, factionData?: any) => {
   try {
+    await backupFile(filePath);
+    
     const rawData = JSON.stringify(data, null, 2);
     await fs.writeFile(filePath, rawData, 'utf-8');
 
     if (factionData) {
       const dirPath = path.dirname(filePath);
       const factionFilePath = path.join(dirPath, 'FactionData.txt');
+      
+      await backupFile(factionFilePath);
+      
       const rawFactionData = JSON.stringify(factionData, null, 2);
       await fs.writeFile(factionFilePath, rawFactionData, 'utf-8');
     }
