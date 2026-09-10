@@ -58,7 +58,7 @@ export default function MainLayout() {
             Open
           </Button>
           <Button color="inherit" startIcon={<SaveIcon />} onClick={handleSaveFile} disabled={!currentFilePath}>
-            Master Save
+            Save
           </Button>
         </Toolbar>
       </AppBar>
