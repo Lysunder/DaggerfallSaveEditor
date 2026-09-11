@@ -33,7 +33,7 @@ jobs:
         run: npm run build
 
       - name: Build and package
-        run: npm run build:dist
+        run: npm run build:dist -- -p never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
