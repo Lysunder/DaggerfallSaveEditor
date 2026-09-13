@@ -76,6 +76,55 @@ export interface BankAccount {
   [key: string]: any;
 }
 
+export interface DFCareer {
+  Name: string;
+  AdvancementMultiplier: number;
+  HitPointsPerLevel: number;
+  
+  // Tolerances
+  Paralysis: string;
+  Magic: string;
+  Poison: string;
+  Fire: string;
+  Frost: string;
+  Shock: string;
+  Disease: string;
+  
+  // Spell Point Multiplier
+  SpellPointMultiplier: string;
+  SpellPointMultiplierValue: number;
+  
+  // Magic and Abilities
+  DarknessPoweredMagery: string;
+  LightPoweredMagery: string;
+  SpellAbsorption: string;
+  Regeneration: string;
+  RapidHealing: string;
+  
+  // Booleans
+  NoRegenSpellPoints: boolean;
+  AcuteHearing: boolean;
+  Athleticism: boolean;
+  AdrenalineRush: boolean;
+  DamageFromSunlight: boolean;
+  DamageFromHolyPlaces: boolean;
+  
+  // Bitwise Flags
+  ForbiddenMaterials: string;
+  ForbiddenShields: string;
+  ForbiddenArmors: string;
+  ForbiddenProficiencies: string;
+  ExpertProficiencies: string;
+  
+  // Modifiers
+  UndeadAttackModifier: number;
+  DaedraAttackModifier: number;
+  HumanoidAttackModifier: number;
+  AnimalsAttackModifier: number;
+  
+  [key: string]: any;
+}
+
 interface PlayerEntity {
   name: string;
   level: number;
@@ -86,6 +135,7 @@ interface PlayerEntity {
   goldPieces: number;
   stats: Stats;
   skills: Skills;
+  careerTemplate?: DFCareer;
   items: Item[];
   wagonItems?: Item[];
   equipTable?: number[];
@@ -149,7 +199,8 @@ interface SaveStore {
   factionData: any | null;
   currentFilePath: string | null;
   loadSaveData: (path: string, data: SaveGameData, factionData?: any) => void;
-  updatePlayerField: (field: keyof Omit<PlayerEntity, 'stats' | 'skills'>, value: number | string) => void;
+  updatePlayerField: (field: keyof Omit<PlayerEntity, 'stats' | 'skills' | 'careerTemplate'>, value: number | string) => void;
+  updateCareerField: (field: keyof DFCareer, value: any) => void;
   updateStat: (stat: keyof Stats, value: number) => void;
   updateSkill: (skill: keyof Skills | string, value: number) => void;
   updateItem: (uid: number, updates: Partial<Item>) => void;
@@ -185,6 +236,13 @@ export const useSaveStore = create<SaveStore>()(
       set((state) => {
         if (state.saveData?.playerData?.playerEntity) {
           (state.saveData.playerData.playerEntity as any)[field] = value;
+        }
+      }),
+
+    updateCareerField: (field, value) =>
+      set((state) => {
+        if (state.saveData?.playerData?.playerEntity?.careerTemplate) {
+          state.saveData.playerData.playerEntity.careerTemplate[field as keyof DFCareer] = value;
         }
       }),
 
