@@ -1,6 +1,7 @@
 import { Typography, Box, Grid } from '@mui/material';
 import { useSaveStore } from '../store/useSaveStore';
 import { CharacterBasics } from '../components/CharacterBasics';
+import { CareerAndAdvantages } from '../components/CareerAndAdvantages';
 import { StatsAndSkills } from '../components/StatsAndSkills';
 import { InventoryManager } from '../components/InventoryManager';
 import { FinancesAndBanking } from '../components/FinancesAndBanking';
@@ -34,6 +35,11 @@ export default function Home() {
         {/* Basic Info */}
         <Grid size={{ xs: 12 }}>
           <CharacterBasics />
+        </Grid>
+        
+        {/* Career & Advantages */}
+        <Grid size={{ xs: 12 }}>
+          <CareerAndAdvantages />
         </Grid>
 
         {/* Attributes & Skills */}
