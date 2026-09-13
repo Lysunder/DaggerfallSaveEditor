@@ -22,4 +22,5 @@ mac:
 linux:
   target:
     - AppImage
+    - tar.gz
   icon: build/icon.svg
