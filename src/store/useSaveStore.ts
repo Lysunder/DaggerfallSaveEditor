@@ -160,6 +160,7 @@ interface SaveStore {
   updateGlobalVar: (name: string, value: boolean) => void;
   updateBankAccount: (regionIndex: number, updates: Partial<BankAccount>) => void;
   updateGuildRank: (factionId: number, newRank: number) => void;
+  updateFactionReputation: (factionId: number, newRep: number) => void;
   updatePlayerPosition: (updates: Partial<any>) => void;
   updatePlayerPositionCoords: (coords: Partial<{x: number, y: number, z: number}>) => void;
   updateBuildingDiscoveryData: (updates: Partial<any>) => void;
@@ -289,6 +290,17 @@ export const useSaveStore = create<SaveStore>()(
           const membership = memberships.find((m: any) => m.Key === factionId);
           if (membership && membership.Value) {
             membership.Value.rank = newRank;
+          }
+        }
+      }),
+
+    updateFactionReputation: (factionId, newRep) =>
+      set((state) => {
+        const factionDict = state.factionData?.factionDict;
+        if (factionDict && Array.isArray(factionDict)) {
+          const faction = factionDict.find((f: any) => f.Key === factionId);
+          if (faction && faction.Value) {
+            faction.Value.rep = newRep;
           }
         }
       }),
