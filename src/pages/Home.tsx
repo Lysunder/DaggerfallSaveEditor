@@ -6,6 +6,7 @@ import { InventoryManager } from '../components/InventoryManager';
 import { FinancesAndBanking } from '../components/FinancesAndBanking';
 import { QuestProgress } from '../components/QuestProgress';
 import { FactionsAndReputation } from '../components/FactionsAndReputation';
+import { AllReputations } from '../components/AllReputations';
 import { LocationAndWorldData } from '../components/LocationAndWorldData';
 
 export default function Home() {
@@ -51,6 +52,11 @@ export default function Home() {
         {/* Factions & Reputation */}
         <Grid size={{ xs: 12 }}>
           <FactionsAndReputation />
+        </Grid>
+
+        {/* All Reputations */}
+        <Grid size={{ xs: 12 }}>
+          <AllReputations />
         </Grid>
 
         {/* Quest Progress & Global Flags */}
