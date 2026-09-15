@@ -19,6 +19,7 @@ This project is built using:
 - **Material UI (MUI)** for UI components and styling
 - **Zustand** for state management
 - **Immer** for immutable state updates
+- **Oxlint** for fast JavaScript/TypeScript linting
 
 ## Getting Started
 
@@ -55,6 +56,20 @@ To create a distributable package for your operating system:
 
 ```bash
 npm run build:dist
+```
+
+### Code Quality & Preview
+
+To run the linter:
+
+```bash
+npm run lint
+```
+
+To preview the production build locally:
+
+```bash
+npm run preview
 ```
 
 ## License
