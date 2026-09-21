@@ -52,6 +52,15 @@ interface Skills {
   [key: string]: number;
 }
 
+export const DAGGERFALL_SKILLS = [
+  'Medical', 'Etiquette', 'Streetwise', 'Jumping', 'Orcish', 'Harpy', 'Giantish',
+  'Dragonish', 'Nymph', 'Daedric', 'Spriggan', 'Centaurian', 'Impish', 'Lockpicking',
+  'Mercantile', 'Pickpocket', 'Stealth', 'Swimming', 'Climbing', 'Backstabbing',
+  'Dodging', 'Running', 'Destruction', 'Restoration', 'Illusion', 'Alteration',
+  'Thaumaturgy', 'Mysticism', 'ShortBlade', 'LongBlade', 'HandToHand', 'Axe',
+  'BluntWeapon', 'Archery', 'CriticalStrike'
+];
+
 export interface Item {
   uid: number;
   shortName: string;

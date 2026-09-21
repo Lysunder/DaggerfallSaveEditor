@@ -14,7 +14,7 @@ import {
   FormGroup,
   type SelectChangeEvent
 } from '@mui/material';
-import { useSaveStore, type DFCareer } from '../store/useSaveStore';
+import { useSaveStore, type DFCareer, DAGGERFALL_SKILLS } from '../store/useSaveStore';
 
 export const CareerAndAdvantages: React.FC = () => {
   const saveData = useSaveStore((state) => state.saveData);
@@ -92,6 +92,74 @@ export const CareerAndAdvantages: React.FC = () => {
               value={career.HitPointsPerLevel || 0}
               onChange={handleNumberChange('HitPointsPerLevel')}
             />
+          </Grid>
+
+          {/* Class Skills */}
+          <Grid size={12}>
+            <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>Class Skills</Typography>
+            
+            <Typography variant="body2" color="text.secondary" gutterBottom>Primary Skills</Typography>
+            <Grid container spacing={2}>
+              {[1, 2, 3].map((num) => (
+                <Grid size={{ xs: 12, sm: 4 }} key={`primary-${num}`}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Primary Skill {num}</InputLabel>
+                    <Select
+                      value={(career[`PrimarySkill${num}`] as string) || 'None'}
+                      label={`Primary Skill ${num}`}
+                      onChange={handleSelectChange(`PrimarySkill${num}` as keyof DFCareer)}
+                    >
+                      <MenuItem value="None">None</MenuItem>
+                      {[...DAGGERFALL_SKILLS].sort((a, b) => a.localeCompare(b)).map(skill => (
+                        <MenuItem key={skill} value={skill}>{skill.replace(/([A-Z])/g, ' $1').trim()}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              ))}
+            </Grid>
+
+            <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mt: 2 }}>Major Skills</Typography>
+            <Grid container spacing={2}>
+              {[1, 2, 3].map((num) => (
+                <Grid size={{ xs: 12, sm: 4 }} key={`major-${num}`}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Major Skill {num}</InputLabel>
+                    <Select
+                      value={(career[`MajorSkill${num}`] as string) || 'None'}
+                      label={`Major Skill ${num}`}
+                      onChange={handleSelectChange(`MajorSkill${num}` as keyof DFCareer)}
+                    >
+                      <MenuItem value="None">None</MenuItem>
+                      {[...DAGGERFALL_SKILLS].sort((a, b) => a.localeCompare(b)).map(skill => (
+                        <MenuItem key={skill} value={skill}>{skill.replace(/([A-Z])/g, ' $1').trim()}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              ))}
+            </Grid>
+
+            <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mt: 2 }}>Minor Skills</Typography>
+            <Grid container spacing={2}>
+              {[1, 2, 3, 4, 5, 6].map((num) => (
+                <Grid size={{ xs: 12, sm: 4 }} key={`minor-${num}`}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Minor Skill {num}</InputLabel>
+                    <Select
+                      value={(career[`MinorSkill${num}`] as string) || 'None'}
+                      label={`Minor Skill ${num}`}
+                      onChange={handleSelectChange(`MinorSkill${num}` as keyof DFCareer)}
+                    >
+                      <MenuItem value="None">None</MenuItem>
+                      {[...DAGGERFALL_SKILLS].sort((a, b) => a.localeCompare(b)).map(skill => (
+                        <MenuItem key={skill} value={skill}>{skill.replace(/([A-Z])/g, ' $1').trim()}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              ))}
+            </Grid>
           </Grid>
 
           {/* Booleans (Advantages/Disadvantages) */}
