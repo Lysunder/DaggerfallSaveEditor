@@ -89,6 +89,19 @@ export interface DFCareer {
   Name: string;
   AdvancementMultiplier: number;
   HitPointsPerLevel: number;
+
+  PrimarySkill1: string;
+  PrimarySkill2: string;
+  PrimarySkill3: string;
+  MajorSkill1: string;
+  MajorSkill2: string;
+  MajorSkill3: string;
+  MinorSkill1: string;
+  MinorSkill2: string;
+  MinorSkill3: string;
+  MinorSkill4: string;
+  MinorSkill5: string;
+  MinorSkill6: string;
   
   // Tolerances
   Paralysis: string;
@@ -156,6 +169,8 @@ interface PlayerEntity {
   reputationUnderworld?: number;
   reputationSupernaturalBeings?: number;
   reputationGuildMembers?: number;
+  startingLevelUpSkillSum?: number;
+  currentLevelUpSkillSum?: number;
   [key: string]: any;
 }
 
