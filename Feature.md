@@ -7,6 +7,7 @@
 - **Vitals**: Modify current and maximum Health, Magicka, and Fatigue.
 - **Attributes (Stats)**: Adjust all core attributes (Strength, Intelligence, Willpower, Agility, Endurance, Personality, Speed, Luck).
 - **Skills**: Directly edit the mastery level of all Primary, Major, and Minor skills (Weapon skills, Magic schools, utility skills like Stealth and Climbing, and languages).
+- **Level Progress**: View exact skill increases required to reach the next character level, dynamically calculated from your current skills.
 
 ### 🛡️ Career & Advantages
 - **Special Abilities**: Toggle advantages/disadvantages such as Acute Hearing, Athleticism, Adrenaline Rush, Damage from Sunlight/Holy Places, and No Regen Spell Points.
@@ -51,6 +52,7 @@
 ### Version 1.0.6
 
 ✨ **New Features & Improvements:**
+- **Level Progress**: Added a real-time progress bar to the Stats & Skills page showing exactly how many skill increases are needed for your next level.
 - **Skill Editing**: Added the ability to edit character skills directly.
 
 ### Version 1.0.5
