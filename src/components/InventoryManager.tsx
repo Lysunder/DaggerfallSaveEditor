@@ -30,27 +30,28 @@ export const InventoryManager: React.FC = () => {
   const [editItem, setEditItem] = useState<Item | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
 
-  if (!saveData?.playerData?.playerEntity) return null;
-  
-  const { items = [], wagonItems = [], equipTable = [] } = saveData.playerData.playerEntity;
-
-  const currentItems = tabIndex === 0 ? items : wagonItems;
+  const playerEntity = saveData?.playerData?.playerEntity;
   const isInventory = tabIndex === 0;
+  const currentItems = isInventory ? playerEntity?.items : playerEntity?.wagonItems;
 
   // Derive unique categories
   const categories = useMemo(() => {
-    const cats = new Set(currentItems.map(i => i.itemGroup));
+    const cats = new Set((currentItems ?? []).map(i => i.itemGroup));
     return ['All', ...Array.from(cats)].sort();
   }, [currentItems]);
 
   // Filter items
   const filteredItems = useMemo(() => {
-    return currentItems.filter((item) => {
+    return (currentItems ?? []).filter((item) => {
       const matchName = item.shortName.toLowerCase().includes(searchTerm.toLowerCase());
       const matchCategory = categoryFilter === 'All' || item.itemGroup === categoryFilter;
       return matchName && matchCategory;
     });
   }, [currentItems, searchTerm, categoryFilter]);
+
+  if (!playerEntity) return null;
+
+  const { equipTable = [] } = playerEntity;
 
   const handleRepairAll = () => {
     repairAllItems(isInventory ? 'items' : 'wagonItems');
