@@ -42,12 +42,18 @@
 ### 📜 Quests & Global Variables
 - **Global Variables**: Toggle specific global game state variables on or off (used for tracking major world events or quest states).
 - **Quest Tracking**: View and potentially manipulate active quest states.
+- **Main Quest Progress**: See how far you are through the main quest: every branch and quest with its status (completed, in progress, invited, available or locked), the current quest's journal entry and time remaining, who holds the Totem, and which ending you reached. Read-only; uses `QuestData.txt` and `NotebookData.txt` from the save folder when present.
 
 > **Note**: All changes automatically generate a backup (`bak_SaveData.[n].txt`) before writing to prevent data loss.
 
 ---
 
 ## Changelog
+
+### Version 1.0.7
+
+✨ **New Features & Improvements:**
+- **Main Quest Progress**: Added a Main Quest Progress section showing each main quest branch, what's done, what's in progress, and where to go next.
 
 ### Version 1.0.6
 

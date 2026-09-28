@@ -17,7 +17,7 @@ export default function MainLayout() {
     try {
       const result = await window.ipcRenderer.openSaveData();
       if (result.success && result.filePath && result.data) {
-        loadSaveData(result.filePath, result.data, result.factionData);
+        loadSaveData(result.filePath, result.data, result.factionData, result.questData, result.notebookData);
         showNotification(`Successfully loaded ${result.filePath}`, 'success');
       } else if (!result.success && !result.canceled) {
         showNotification(`Failed to open save data: ${result.error}`, 'error');

@@ -23,12 +23,15 @@ CI (`.github/workflows/build.yml`) builds on Windows/Linux/macOS for pushes to `
 - `dialog:openSaveData` — opens a file dialog, parses the chosen save as JSON, and also tries to load `FactionData.txt` from the same directory (silently `null` if missing).
 - `fs:saveData` — before writing, copies the existing file to the next free `bak_<name>.<n><ext>` backup; writes both `SaveData` and (if loaded) `FactionData.txt` as 2-space-indented JSON.
 
+`dialog:openSaveData` also loads `QuestData.txt` and `NotebookData.txt` when present. These are **read-only**: they are never written back (`QuestData.txt` uses FullSerializer `$type`/`$ref` annotations that are unsafe to round-trip).
+
 **Preload (`electron/preload.ts`)** exposes `window.ipcRenderer` with generic `on/off/send/invoke` plus `openSaveData()` / `saveData()`. Types for this bridge are in `src/global.d.ts` — update both when adding an IPC channel.
 
 **Renderer state (`src/store/useSaveStore.ts`)** is the single source of truth: the whole parsed save (`saveData`), the faction file (`factionData`), and `currentFilePath`. Every edit goes through a named store action that mutates the Immer draft in place. The save is round-tripped whole, so actions must only change the targeted fields and preserve every unknown property — the TypeScript interfaces are partial and use `[key: string]: any` index signatures for this reason. Key data locations:
 - `saveData.playerData.playerEntity` — name/level/vitals, `stats`, `skills`, `careerTemplate` (class definition: primary/major/minor skills, tolerances, advantages, bitflag strings), `items`, `wagonItems`, `equipTable` (item UIDs; deleting an inventory item zeroes its slot), `globalVars`, `reputation*` fields.
 - `saveData.playerData.playerPosition`, `guildMemberships`; `saveData.bankAccounts`, `bankDeeds`, `dateAndTime.gameTime`.
 - `factionData.factionDict` — array of `{ Key, Value: { id, name, rep, ... } }`.
+- `questData.quests` — quests DFU is currently tracking. Finished quests are removed a week after they end, so `src/utils/mainQuestProgress.ts` infers main quest progress from the backbone quest `S0000999`, completed `StartQuest` actions, globals and `notebookData.finishedQuestEntries`. See `docs/main-quest-progress-plan.md` for how the signals work; quest definitions live in `src/data/mainQuest.ts`.
 
 **UI**: `src/App.tsx` sets a dark MUI theme and a `HashRouter` (hash routing is required for `file://` loading in the packaged app). `src/layout/MainLayout.tsx` holds the Open/Save toolbar that calls the IPC bridge. `src/pages/Home.tsx` is the character sheet, composed of self-contained section components in `src/components/` — each reads `saveData` from the store, returns `null` if no save is loaded, and calls store actions directly. User feedback goes through `useNotification()` from `src/context/NotificationContext.tsx`.
 
