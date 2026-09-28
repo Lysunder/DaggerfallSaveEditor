@@ -13,14 +13,10 @@ export const QuestProgress = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterState, setFilterState] = useState<'all' | 'active' | 'inactive'>('all');
 
-  if (!saveData || !saveData.playerData?.playerEntity?.globalVars) {
-    return null;
-  }
-
-  const globalVars = saveData.playerData.playerEntity.globalVars || [];
+  const globalVars = saveData?.playerData?.playerEntity?.globalVars;
 
   const filteredVars = useMemo(() => {
-    let result = globalVars;
+    let result = globalVars ?? [];
 
     // Apply state filter
     if (filterState === 'active') {
@@ -37,6 +33,10 @@ export const QuestProgress = () => {
 
     return result;
   }, [globalVars, searchQuery, filterState]);
+
+  if (!globalVars) {
+    return null;
+  }
 
   return (
     <Paper sx={{ p: 3, borderRadius: 2, display: 'flex', flexDirection: 'column', backgroundImage: 'linear-gradient(rgba(244, 143, 177, 0.05), rgba(255, 255, 255, 0))' }}>

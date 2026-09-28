@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -32,13 +32,21 @@ function createWindow() {
 
   win.setMenu(null);
 
+  // Open external links (e.g. UESP quest pages) in the system browser instead of a new app window.
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('https://')) {
+      shell.openExternal(url);
+    }
+    return { action: 'deny' };
+  });
+
   // Test active push message to Renderer-process.
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', (new Date).toLocaleString());
   });
 
-  win.webContents.on('console-message', (event, level, message, line, sourceId) => {
-    console.log(`[Renderer]: ${message} (at ${sourceId}:${line})`);
+  win.webContents.on('console-message', ({ message, sourceId, lineNumber }) => {
+    console.log(`[Renderer]: ${message} (at ${sourceId}:${lineNumber})`);
   });
 
   if (VITE_DEV_SERVER_URL) {
@@ -63,18 +71,23 @@ ipcMain.handle('dialog:openSaveData', async () => {
       const rawData = await fs.readFile(filePath, 'utf-8');
       const parsedData = JSON.parse(rawData);
 
-      // Check for FactionData.txt
-      let factionData = null;
+      // Sibling save files; each is optional. QuestData and NotebookData are read-only.
       const dirPath = path.dirname(filePath);
-      const factionFilePath = path.join(dirPath, 'FactionData.txt');
-      try {
-        const factionRaw = await fs.readFile(factionFilePath, 'utf-8');
-        factionData = JSON.parse(factionRaw);
-      } catch (err) {
-        // Ignore if FactionData.txt does not exist
-      }
+      const readSibling = async (fileName: string) => {
+        try {
+          const raw = await fs.readFile(path.join(dirPath, fileName), 'utf-8');
+          return JSON.parse(raw);
+        } catch {
+          return null;
+        }
+      };
+      const [factionData, questData, notebookData] = await Promise.all([
+        readSibling('FactionData.txt'),
+        readSibling('QuestData.txt'),
+        readSibling('NotebookData.txt'),
+      ]);
 
-      return { success: true, filePath, data: parsedData, factionData };
+      return { success: true, filePath, data: parsedData, factionData, questData, notebookData };
     } catch (error: any) {
       return { success: false, error: error.message };
     }

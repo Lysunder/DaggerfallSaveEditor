@@ -2,9 +2,6 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from './layout/MainLayout';
 import Home from './pages/Home';
-import Inventory from './pages/Inventory';
-
-
 import { NotificationProvider } from './context/NotificationContext';
 
 const darkTheme = createTheme({
@@ -27,9 +24,6 @@ function App() {
           <Routes>
             <Route path="/" element={<MainLayout />}>
               <Route index element={<Home />} />
-              <Route path="inventory" element={<Inventory />} />
-
-
             </Route>
           </Routes>
         </HashRouter>

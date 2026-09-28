@@ -9,19 +9,22 @@ export const AllReputations = () => {
   const updateFactionReputation = useSaveStore((state) => state.updateFactionReputation);
   const { showNotification } = useNotification();
 
-  if (!factionData || !factionData.factionDict || !Array.isArray(factionData.factionDict)) {
-    return null;
-  }
+  const factionDict = factionData?.factionDict;
 
   const rows = useMemo(() => {
-    return factionData.factionDict.map((item: any) => ({
+    if (!Array.isArray(factionDict)) return [];
+    return factionDict.map((item: any) => ({
       id: item.Key,
       name: item.Value?.name || `Faction ${item.Key}`,
       type: item.Value?.type ?? 'Unknown',
       region: item.Value?.region ?? 'Unknown',
       rep: item.Value?.rep ?? 0,
     }));
-  }, [factionData.factionDict]);
+  }, [factionDict]);
+
+  if (!Array.isArray(factionDict)) {
+    return null;
+  }
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'Faction ID', width: 100 },

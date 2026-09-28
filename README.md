@@ -10,6 +10,21 @@ A desktop application for editing save files from The Elder Scrolls II: Daggerfa
 - Tweak quest variables and progress
 - Change faction reputations
 
+## Installing on macOS
+
+Download the DMG for your Mac from the [releases page](https://github.com/Lysunder/DaggerfallSaveEditor/releases): `arm64` for Apple Silicon (M1 and later), `x64` for Intel.
+
+The app is not notarized by Apple, so macOS blocks it the first time you open it. After dragging it to Applications:
+
+1. Open the app once and dismiss the warning.
+2. Go to **System Settings → Privacy & Security**, scroll down, and click **Open Anyway** next to the message about the app.
+
+If macOS says the app "is damaged and can't be opened", remove the download quarantine flag in Terminal and open it again:
+
+```bash
+xattr -cr "/Applications/Daggerfall Unity Save Editor.app"
+```
+
 ## Tech Stack
 
 This project is built using:

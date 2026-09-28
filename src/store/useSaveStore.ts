@@ -218,11 +218,68 @@ interface SaveGameData {
   [key: string]: any;
 }
 
+// QuestData.txt and NotebookData.txt are loaded read-only and never written back.
+export interface QuestSymbol {
+  original: string;
+  name: string;
+}
+
+export interface QuestActionSaveData {
+  type: string;
+  isComplete: boolean;
+  debugSource?: string;
+  actionSpecific?: any;
+  [key: string]: any;
+}
+
+export interface QuestTaskSaveData {
+  symbol: QuestSymbol;
+  triggered: boolean;
+  prevTriggered: boolean;
+  dropped: boolean;
+  type: string;
+  globalVarName?: string | null;
+  actions: QuestActionSaveData[];
+  [key: string]: any;
+}
+
+export interface QuestLogEntry {
+  stepID: number;
+  messageID: number;
+  dateTime: { Year: number; Month: number; Day: number; Hour: number; Minute: number; Second: number };
+}
+
+export interface QuestSaveData {
+  uid: number;
+  questName: string;
+  displayName: string;
+  questComplete: boolean;
+  questSuccess: boolean;
+  questTombstoned: boolean;
+  activeLogMessages: QuestLogEntry[];
+  messages: { id: number; lines: string[]; [key: string]: any }[];
+  resources: { type: string; symbol: QuestSymbol; resourceSpecific?: any; [key: string]: any }[];
+  tasks: QuestTaskSaveData[];
+  [key: string]: any;
+}
+
+export interface QuestMachineData {
+  quests: QuestSaveData[];
+  [key: string]: any;
+}
+
+export interface NotebookData {
+  finishedQuestEntries: string[][];
+  [key: string]: any;
+}
+
 interface SaveStore {
   saveData: SaveGameData | null;
   factionData: any | null;
+  questData: QuestMachineData | null;
+  notebookData: NotebookData | null;
   currentFilePath: string | null;
-  loadSaveData: (path: string, data: SaveGameData, factionData?: any) => void;
+  loadSaveData: (path: string, data: SaveGameData, factionData?: any, questData?: QuestMachineData, notebookData?: NotebookData) => void;
   updatePlayerField: (field: keyof Omit<PlayerEntity, 'stats' | 'skills' | 'careerTemplate'>, value: number | string) => void;
   updateCareerField: (field: keyof DFCareer, value: any) => void;
   updateStat: (stat: keyof Stats, value: number) => void;
@@ -247,13 +304,17 @@ export const useSaveStore = create<SaveStore>()(
   immer((set) => ({
     saveData: null,
     factionData: null,
+    questData: null,
+    notebookData: null,
     currentFilePath: null,
 
-    loadSaveData: (path, data, factionData) =>
+    loadSaveData: (path, data, factionData, questData, notebookData) =>
       set((state) => {
         state.currentFilePath = path;
         state.saveData = data;
         state.factionData = factionData || null;
+        state.questData = questData || null;
+        state.notebookData = notebookData || null;
       }),
 
     updatePlayerField: (field, value) =>
@@ -423,6 +484,8 @@ export const useSaveStore = create<SaveStore>()(
       set((state) => {
         state.saveData = null;
         state.factionData = null;
+        state.questData = null;
+        state.notebookData = null;
         state.currentFilePath = null;
       }),
   }))

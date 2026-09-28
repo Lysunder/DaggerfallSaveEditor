@@ -59,18 +59,6 @@ export const FactionsAndReputation = () => {
   const updatePlayerField = useSaveStore((state) => state.updatePlayerField);
   const updateGuildRank = useSaveStore((state) => state.updateGuildRank);
 
-  if (!saveData || !saveData.playerData?.playerEntity) {
-    return null;
-  }
-
-  const { playerEntity } = saveData.playerData;
-  const memberships = saveData.playerData.guildMemberships || [];
-  const vampireMemberships = saveData.playerData.vampireMemberships || [];
-
-  const handleReputationChange = (key: string, value: number | number[]) => {
-    updatePlayerField(key as any, value as number);
-  };
-
   const dynamicFactions = React.useMemo(() => {
     const dict: Record<number, string> = {};
     if (factionData?.factionDict && Array.isArray(factionData.factionDict)) {
@@ -82,6 +70,18 @@ export const FactionsAndReputation = () => {
     }
     return dict;
   }, [factionData]);
+
+  if (!saveData || !saveData.playerData?.playerEntity) {
+    return null;
+  }
+
+  const { playerEntity } = saveData.playerData;
+  const memberships = saveData.playerData.guildMemberships || [];
+  const vampireMemberships = saveData.playerData.vampireMemberships || [];
+
+  const handleReputationChange = (key: string, value: number | number[]) => {
+    updatePlayerField(key as any, value as number);
+  };
 
   return (
     <Paper sx={{ p: 3, borderRadius: 2, display: 'flex', flexDirection: 'column', backgroundImage: 'linear-gradient(rgba(103, 58, 183, 0.05), rgba(255, 255, 255, 0))' }}>
