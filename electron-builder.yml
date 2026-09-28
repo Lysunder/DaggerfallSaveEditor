@@ -5,6 +5,11 @@ directories:
   output: release/
   buildResources: build
 
+# Vite bundles the renderer and main process, so only the build output is packaged.
+files:
+  - dist/**/*
+  - dist-electron/**/*
+
 publish:
   provider: github
 
@@ -16,8 +21,15 @@ win:
 
 mac:
   target:
-    - dmg
+    - target: dmg
+      arch:
+        - arm64
+        - x64
   icon: build/icon.svg
+  # No Apple Developer ID: ad-hoc sign so the app launches on Apple Silicon.
+  # Hardened runtime must be off for ad-hoc signing (it rejects Electron's differently-signed frameworks).
+  identity: '-'
+  hardenedRuntime: false
 
 linux:
   target:

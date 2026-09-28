@@ -45,8 +45,8 @@ function createWindow() {
     win?.webContents.send('main-process-message', (new Date).toLocaleString());
   });
 
-  win.webContents.on('console-message', (event, level, message, line, sourceId) => {
-    console.log(`[Renderer]: ${message} (at ${sourceId}:${line})`);
+  win.webContents.on('console-message', ({ message, sourceId, lineNumber }) => {
+    console.log(`[Renderer]: ${message} (at ${sourceId}:${lineNumber})`);
   });
 
   if (VITE_DEV_SERVER_URL) {
