@@ -57,6 +57,22 @@ function createWindow() {
     win?.webContents.send('main-process-message', (new Date).toLocaleString());
   });
 
+  // The renderer blocks unload (beforeunload) while there are unsaved changes; ask before closing.
+  win.webContents.on('will-prevent-unload', (event) => {
+    const choice = dialog.showMessageBoxSync(win!, {
+      type: 'warning',
+      title: 'Unsaved changes',
+      message: 'You have unsaved changes to this save.',
+      detail: 'Quit without saving them? To keep them, choose Cancel and save first.',
+      buttons: ['Quit without saving', 'Cancel'],
+      defaultId: 1,
+      cancelId: 1,
+    });
+    if (choice === 0) {
+      event.preventDefault(); // lets the unload go ahead
+    }
+  });
+
   win.webContents.on('console-message', ({ message, sourceId, lineNumber }) => {
     console.log(`[Renderer]: ${message} (at ${sourceId}:${lineNumber})`);
   });
@@ -243,12 +259,14 @@ async function backupFile(filePath: string) {
   }
 }
 
-ipcMain.handle('fs:saveData', async (_event, filePath: string, data: any, factionData?: any) => {
+// Only the files passed are written (and backed up); null/undefined means unchanged.
+ipcMain.handle('fs:saveData', async (_event, filePath: string, data: any | null, factionData?: any) => {
   try {
-    await backupFile(filePath);
-    
-    const rawData = JSON.stringify(data, null, 2);
-    await fs.writeFile(filePath, rawData, 'utf-8');
+    if (data) {
+      await backupFile(filePath);
+      const rawData = JSON.stringify(data, null, 2);
+      await fs.writeFile(filePath, rawData, 'utf-8');
+    }
 
     if (factionData) {
       const dirPath = path.dirname(filePath);

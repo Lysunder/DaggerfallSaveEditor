@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Box, AppBar, CssBaseline, Toolbar, Typography, Button, Dialog, DialogContent, DialogActions, Tooltip } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Box, AppBar, Badge, Chip, CssBaseline, Toolbar, Typography, Button, Dialog, DialogContent, DialogActions, Tooltip } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
@@ -7,33 +7,38 @@ import SaveIcon from '@mui/icons-material/Save';
 import ListIcon from '@mui/icons-material/List';
 
 import { useSaveStore } from '../store/useSaveStore';
-import { useNotification } from '../context/NotificationContext';
 import { useSaveLoader } from '../hooks/useSaveLoader';
+import { useSaveWriter } from '../hooks/useSaveWriter';
+import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
 import { SaveBrowser } from '../components/SaveBrowser';
+import { ChangeListDialog } from '../components/ChangeListDialog';
+
+const APP_TITLE = 'Daggerfall Unity Save Editor';
 
 export default function MainLayout() {
   const currentFilePath = useSaveStore((state) => state.currentFilePath);
   const saveData = useSaveStore((state) => state.saveData);
   const saveInfo = useSaveStore((state) => state.saveInfo);
-  const { showNotification } = useNotification();
   const { openFile } = useSaveLoader();
+  const { save } = useSaveWriter();
+  const { count, isDirty } = useUnsavedChanges();
   const [browserOpen, setBrowserOpen] = useState(false);
+  const [changesOpen, setChangesOpen] = useState(false);
 
-  const handleSaveFile = async () => {
-    if (!currentFilePath || !saveData) return;
+  useEffect(() => {
+    document.title = isDirty ? `* ${APP_TITLE}` : APP_TITLE;
+  }, [isDirty]);
 
-    try {
-      const factionData = useSaveStore.getState().factionData;
-      const result = await window.ipcRenderer.saveData(currentFilePath, saveData, factionData);
-      if (result.success) {
-        showNotification('Save data written successfully!', 'success');
-      } else {
-        showNotification(`Failed to write save data: ${result.error}`, 'error');
-      }
-    } catch (error: any) {
-      showNotification(`An unexpected error occurred: ${error.message}`, 'error');
-    }
-  };
+  // Blocks closing or reloading while there are unsaved changes; the main process then asks the user.
+  useEffect(() => {
+    if (!isDirty) return;
+    const block = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = false;
+    };
+    window.addEventListener('beforeunload', block);
+    return () => window.removeEventListener('beforeunload', block);
+  }, [isDirty]);
 
   const currentSaveLabel = !currentFilePath
     ? 'No save loaded'
@@ -47,16 +52,25 @@ export default function MainLayout() {
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Daggerfall Unity Save Editor
+            {APP_TITLE}
             <Typography component="span" variant="body2" color="text.secondary" sx={{ ml: 1 }}>
               v{__APP_VERSION__}
             </Typography>
           </Typography>
           <Tooltip title={currentFilePath ?? ''}>
-            <Typography variant="body2" noWrap sx={{ mr: 2, maxWidth: 360 }}>
+            <Typography variant="body2" noWrap sx={{ mr: 1, maxWidth: 360 }}>
               {currentSaveLabel}
             </Typography>
           </Tooltip>
+          {isDirty && (
+            <Chip
+              label={`● ${count} unsaved ${count === 1 ? 'change' : 'changes'}`}
+              size="small"
+              color="warning"
+              onClick={() => setChangesOpen(true)}
+              sx={{ mr: 2 }}
+            />
+          )}
           {/* Without a save loaded, the browser is already on the page. */}
           {saveData && (
             <Button color="inherit" startIcon={<ListIcon />} onClick={() => setBrowserOpen(true)}>
@@ -66,7 +80,16 @@ export default function MainLayout() {
           <Button color="inherit" startIcon={<FolderOpenIcon />} onClick={openFile}>
             Open file…
           </Button>
-          <Button color="inherit" startIcon={<SaveIcon />} onClick={handleSaveFile} disabled={!currentFilePath}>
+          <Button
+            color="inherit"
+            onClick={save}
+            disabled={!currentFilePath || !isDirty}
+            startIcon={
+              <Badge badgeContent={isDirty ? count : undefined} color="warning" invisible={!isDirty} max={99}>
+                <SaveIcon />
+              </Badge>
+            }
+          >
             Save
           </Button>
         </Toolbar>
@@ -84,6 +107,8 @@ export default function MainLayout() {
           <Button onClick={() => setBrowserOpen(false)}>Close</Button>
         </DialogActions>
       </Dialog>
+
+      <ChangeListDialog open={changesOpen} onClose={() => setChangesOpen(false)} />
     </Box>
   );
 }

@@ -6,7 +6,8 @@ export interface IpcRenderer {
   send(channel: string, ...args: any[]): void;
   invoke(channel: string, ...args: any[]): Promise<any>;
   openSaveData(): Promise<LoadResult>;
-  saveData(filePath: string, data: any, factionData?: any): Promise<{ success: boolean; error?: string }>;
+  /** Writes only the files passed; pass null for data or omit factionData when unchanged. */
+  saveData(filePath: string, data: any | null, factionData?: any): Promise<{ success: boolean; error?: string }>;
 
   // Save browser
   scanSaves(): Promise<{ locations: SaveLocation[]; saves: SaveSlot[] }>;
