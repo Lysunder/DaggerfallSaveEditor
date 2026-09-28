@@ -1,9 +1,11 @@
 name: Build and Package Editor
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
+      - features
     tags:
       - 'v*'
       - '*'
