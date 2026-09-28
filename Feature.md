@@ -50,6 +50,11 @@
 
 ## Changelog
 
+### Version 1.0.8
+
+✨ **New Features & Improvements:**
+- **Version Display**: The app's version number is now shown next to the title.
+
 ### Version 1.0.7
 
 ✨ **New Features & Improvements:**
