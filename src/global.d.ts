@@ -8,6 +8,9 @@ export interface IpcRenderer {
 }
 
 declare global {
+  /** App version from package.json, injected by Vite's `define`. */
+  const __APP_VERSION__: string;
+
   interface Window {
     ipcRenderer: IpcRenderer;
   }

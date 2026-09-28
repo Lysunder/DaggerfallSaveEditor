@@ -50,6 +50,9 @@ export default function MainLayout() {
         <Toolbar>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Daggerfall Unity Save Editor
+            <Typography component="span" variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+              v{__APP_VERSION__}
+            </Typography>
           </Typography>
           <Typography variant="body2" sx={{ mr: 2 }}>
             {currentFilePath ? `Editing: ${currentFilePath}` : 'No save loaded'}
