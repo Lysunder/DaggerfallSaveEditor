@@ -299,8 +299,8 @@ interface SaveStore {
   repairs: EnumRepairEntry[];
   loadSaveData: (save: LoadedSave) => void;
   setRepairs: (repairs: EnumRepairEntry[]) => void;
-  /** Makes the current data the new baseline, after a successful write. */
-  markSaved: () => void;
+  /** Makes the data that was just written the new baseline. Ignored if another save was loaded meanwhile. */
+  markSaved: (filePath: string, savedData: SaveGameData, savedFactionData: any | null) => void;
   /** Returns to the baseline, keeping load-time repairs. */
   discardChanges: () => void;
   revertChange: (change: Change) => RevertResult;
@@ -542,14 +542,13 @@ export const useSaveStore = create<SaveStore>()(
         state.repairs = repairs;
       }),
 
-    markSaved: () => {
-      const { saveData, factionData } = get();
+    markSaved: (filePath, savedData, savedFactionData) =>
       set((state) => {
-        state.baselineSaveData = saveData;
-        state.baselineFactionData = factionData;
+        if (state.currentFilePath !== filePath) return;
+        state.baselineSaveData = savedData;
+        state.baselineFactionData = savedFactionData;
         state.repairs = [];
-      });
-    },
+      }),
 
     discardChanges: () => {
       // Built outside the store's draft so the baseline itself is never modified.

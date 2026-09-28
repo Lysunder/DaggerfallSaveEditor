@@ -7,7 +7,8 @@ import { makeFactions, makeSave, type TestSave as Save } from './testFixtures';
 const labelOf = (edit: (draft: Save) => void) => {
   const base = makeSave();
   const [change] = diffSave(base, produce(base, edit));
-  return labelChange(change, { factionNames: new Map([[40, 'Mages Guild']]) });
+  // Faction 10 is a decoy: memberships are keyed by guild group, which must not be used as a faction id.
+  return labelChange(change, { factionNames: new Map([[40, 'Mages Guild'], [10, 'Wrong Faction']]) });
 };
 
 describe('labelChange', () => {

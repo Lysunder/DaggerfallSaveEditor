@@ -74,6 +74,10 @@
 - **Saves That Wouldn't Load**: Choosing more than one forbidden material, shield, armor or proficiency wrote the value in a form Daggerfall Unity can't read (`Iron, Steel` instead of `Iron,Steel`), so the game refused to load the save. The editor now writes it correctly. Opening a save affected by this repairs it automatically; save to write the fix.
 - **Enum Values**: Weather, world context and building type are now written by name, exactly as the game writes them. Building type is a dropdown instead of free text, and building quality only accepts whole numbers, since a typo in either could also stop a save loading.
 - **Time Shifting**: The hour and day buttons moved the clock by the wrong amount ("+1 Hour" added 12 minutes). They now move it by exactly one hour or one day.
+- **Position Fields**: Clearing a coordinate, yaw, pitch or world position field (for example, to type a new value) and then saving wrote an empty value that Daggerfall Unity can't load. Empty or partial input is now ignored, and the field keeps its last valid value.
+- **Bank Accounts**: Clearing an Account Balance or Loan Total cell wrote an empty value that Daggerfall Unity can't load. An emptied cell now keeps its previous value, and balances are stored as whole numbers.
+- **Quest Flag Index**: The index shown next to each global variable was its position in the filtered list rather than its real index, so it changed while searching or filtering.
+- **Inventory Filter**: A category filter chosen on the Inventory tab carried over to the Wagon tab, which could hide every wagon item. Switching tabs now resets the filter.
 
 ### Version 1.0.7
 

@@ -25,7 +25,8 @@ export const useSaveWriter = () => {
         showNotification(`Failed to write save data: ${result.error}`, 'error');
         return false;
       }
-      markSaved();
+      // The snapshot that was written, not the current state: edits made while writing stay unsaved.
+      markSaved(currentFilePath, saveData, factionData);
       showNotification(`Saved ${changes.length} ${changes.length === 1 ? 'change' : 'changes'}.`, 'success');
       return true;
     } catch (error: any) {

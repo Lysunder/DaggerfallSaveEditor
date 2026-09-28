@@ -1,12 +1,22 @@
 // Turns a Change into what the change list shows: a section, a label and formatted values.
 import { REGION_NAMES } from '../data/regions';
+import { guildName } from '../data/guilds';
 import { formatGameTime } from './daggerfallDate';
 import { propertyPath, type Change } from './saveDiff';
 
 export interface LabelContext {
   /** Faction id → name, from FactionData.txt; used for guild memberships. */
   factionNames?: Map<number, string>;
+  /** Guild group → membership variant (knightly and holy orders need it to name the faction). */
+  guildVariants?: Map<number, number>;
 }
+
+const membershipName = (change: Change, context: LabelContext) => {
+  const group = Number(recordKey(change));
+  const record = (change.before ?? change.after) as { Value?: { variant?: number } } | undefined;
+  const variant = context.guildVariants?.get(group) ?? record?.Value?.variant ?? 0;
+  return guildName(group, variant, context.factionNames);
+};
 
 export interface ChangeLabel {
   section: string;
@@ -52,7 +62,8 @@ export const labelChange = (change: Change, context: LabelContext = {}): ChangeL
   if (change.kind !== 'changed') {
     const verb = change.kind === 'added' ? 'Added' : 'Removed';
     const section = sectionFor(change, path);
-    return { section, label: `${verb}: ${recordName}`, before: '', after: '' };
+    const name = path === 'playerData.guildMemberships' ? membershipName(change, context) : recordName;
+    return { section, label: `${verb}: ${name}`, before: '', after: '' };
   }
 
   if (change.file === 'faction') {
@@ -93,9 +104,8 @@ export const labelChange = (change: Change, context: LabelContext = {}): ChangeL
     return { section: 'Finances', label: `Bank (${regionName}) – ${what}`, ...values };
   }
   if (under('playerData.guildMemberships.')) {
-    const factionId = Number(recordKey(change));
-    const name = context.factionNames?.get(factionId) ?? `Faction ${factionId}`;
-    return { section: 'Factions & Reputation', label: `${name} – ${field === 'rank' ? 'rank' : spacedName(field)}`, ...values };
+    // Keyed by guild group, not faction id (see src/data/guilds.ts).
+    return { section: 'Factions & Reputation', label: `${membershipName(change, context)} – ${field === 'rank' ? 'rank' : spacedName(field)}`, ...values };
   }
   if (under(`${entity}reputation`)) {
     return { section: 'Factions & Reputation', label: spacedName(field).replace(/^Reputation /, 'Reputation: '), ...values };

@@ -34,6 +34,7 @@ const describeValues = (row: Row) => {
 export const ChangeListDialog = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
   const { changes, repairedIds } = useUnsavedChanges();
   const factionData = useSaveStore((state) => state.factionData);
+  const memberships = useSaveStore((state) => state.saveData?.playerData?.guildMemberships);
   const revertChange = useSaveStore((state) => state.revertChange);
   const discardChanges = useSaveStore((state) => state.discardChanges);
   const { save } = useSaveWriter();
@@ -48,10 +49,15 @@ export const ChangeListDialog = ({ open, onClose }: { open: boolean; onClose: ()
     return names;
   }, [factionData]);
 
+  const guildVariants = useMemo(
+    () => new Map((memberships ?? []).map((membership) => [membership.Key, membership.Value?.variant ?? 0])),
+    [memberships],
+  );
+
   const sections = useMemo(() => {
     const bySection = new Map<string, Map<string, RecordGroup>>();
     for (const change of changes) {
-      const row: Row = { change, label: labelChange(change, { factionNames }), repaired: repairedIds.has(change.id) };
+      const row: Row = { change, label: labelChange(change, { factionNames, guildVariants }), repaired: repairedIds.has(change.id) };
       // A record's field changes are grouped so they can be reverted together.
       const groupId = change.record && change.kind === 'changed' ? changeId(change.file, change.record.path) : change.id;
       const groups = bySection.get(row.label.section) ?? new Map<string, RecordGroup>();
@@ -63,7 +69,7 @@ export const ChangeListDialog = ({ open, onClose }: { open: boolean; onClose: ()
     return [...bySection.entries()]
       .sort(([a], [b]) => SECTION_ORDER.indexOf(a) - SECTION_ORDER.indexOf(b))
       .map(([section, groups]) => ({ section, groups: [...groups.values()], count: [...groups.values()].reduce((n, g) => n + g.rows.length, 0) }));
-  }, [changes, repairedIds, factionNames]);
+  }, [changes, repairedIds, factionNames, guildVariants]);
 
   const revert = (rows: Row[]) => {
     const occupied: number[] = [];

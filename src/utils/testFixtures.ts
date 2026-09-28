@@ -6,7 +6,8 @@ export const makeSave = () => ({
   bankAccounts: [{ regionIndex: 17, accountGold: 0, loanTotal: 0 }],
   playerData: {
     playerPosition: { weather: 'Overcast', position: { x: 1, y: 2, z: 3 } },
-    guildMemberships: [{ Key: 40, Value: { rank: 2 } }],
+    // Keyed by GuildGroups: 10 is MagesGuild (faction 40).
+    guildMemberships: [{ Key: 10, Value: { rank: 2, variant: 0 } }],
     playerEntity: {
       name: 'Lys',
       level: 5,

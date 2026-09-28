@@ -10,6 +10,12 @@ import { BUILDING_TYPES, WEATHER_TYPES, WORLD_CONTEXTS, buildingTypeName, weathe
 // Selects store DFU's enum member names, which is how the game writes these fields.
 const spaced = (name: string) => name.replace(/([a-z])([A-Z0-9])/g, '$1 $2');
 
+// Ignores empty or partial input ("", "-"): NaN would be saved as null, which DFU can't load.
+const withNumber = (raw: string, parse: (text: string) => number, apply: (value: number) => void) => {
+  const value = parse(raw);
+  if (Number.isFinite(value)) apply(value);
+};
+
 export const LocationAndWorldData = () => {
   const saveData = useSaveStore((state) => state.saveData);
   const updatePlayerPosition = useSaveStore((state) => state.updatePlayerPosition);
@@ -64,7 +70,7 @@ export const LocationAndWorldData = () => {
               size="small"
               fullWidth
               value={playerPosition.position?.x ?? 0}
-              onChange={(e) => updatePlayerPositionCoords({ x: parseFloat(e.target.value) })}
+              onChange={(e) => withNumber(e.target.value, parseFloat, (x) => updatePlayerPositionCoords({ x }))}
               slotProps={{ htmlInput: { step: "0.01" } }}
             />
             <TextField
@@ -73,7 +79,7 @@ export const LocationAndWorldData = () => {
               size="small"
               fullWidth
               value={playerPosition.position?.y ?? 0}
-              onChange={(e) => updatePlayerPositionCoords({ y: parseFloat(e.target.value) })}
+              onChange={(e) => withNumber(e.target.value, parseFloat, (y) => updatePlayerPositionCoords({ y }))}
               slotProps={{ htmlInput: { step: "0.01" } }}
             />
             <TextField
@@ -82,7 +88,7 @@ export const LocationAndWorldData = () => {
               size="small"
               fullWidth
               value={playerPosition.position?.z ?? 0}
-              onChange={(e) => updatePlayerPositionCoords({ z: parseFloat(e.target.value) })}
+              onChange={(e) => withNumber(e.target.value, parseFloat, (z) => updatePlayerPositionCoords({ z }))}
               slotProps={{ htmlInput: { step: "0.01" } }}
             />
           </Box>
@@ -93,7 +99,7 @@ export const LocationAndWorldData = () => {
               size="small"
               fullWidth
               value={playerPosition.yaw ?? 0}
-              onChange={(e) => updatePlayerPosition({ yaw: parseFloat(e.target.value) })}
+              onChange={(e) => withNumber(e.target.value, parseFloat, (yaw) => updatePlayerPosition({ yaw }))}
               slotProps={{ htmlInput: { step: "0.01" } }}
             />
             <TextField
@@ -102,7 +108,7 @@ export const LocationAndWorldData = () => {
               size="small"
               fullWidth
               value={playerPosition.pitch ?? 0}
-              onChange={(e) => updatePlayerPosition({ pitch: parseFloat(e.target.value) })}
+              onChange={(e) => withNumber(e.target.value, parseFloat, (pitch) => updatePlayerPosition({ pitch }))}
               slotProps={{ htmlInput: { step: "0.01" } }}
             />
           </Box>
@@ -117,7 +123,7 @@ export const LocationAndWorldData = () => {
               size="small"
               fullWidth
               value={playerPosition.worldPosX ?? 0}
-              onChange={(e) => updatePlayerPosition({ worldPosX: parseInt(e.target.value) })}
+              onChange={(e) => withNumber(e.target.value, parseInt, (worldPosX) => updatePlayerPosition({ worldPosX }))}
             />
             <TextField
               label="World Pos Z"
@@ -125,7 +131,7 @@ export const LocationAndWorldData = () => {
               size="small"
               fullWidth
               value={playerPosition.worldPosZ ?? 0}
-              onChange={(e) => updatePlayerPosition({ worldPosZ: parseInt(e.target.value) })}
+              onChange={(e) => withNumber(e.target.value, parseInt, (worldPosZ) => updatePlayerPosition({ worldPosZ }))}
             />
           </Box>
         </Grid>

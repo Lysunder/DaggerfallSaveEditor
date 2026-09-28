@@ -95,7 +95,7 @@ export const QuestProgress = () => {
                           {gvar.name}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          (Index: {index})
+                          (Index: {gvar.index ?? index})
                         </Typography>
                         {isUnused && (
                           <Tooltip title="Warning: Usually unused in the base game, but may be utilized by specific mods.">

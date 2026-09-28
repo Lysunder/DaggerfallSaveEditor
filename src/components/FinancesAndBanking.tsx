@@ -28,14 +28,17 @@ export const FinancesAndBanking = () => {
     }
   };
 
+  // Both are C# ints in DFU. An emptied cell arrives as null, which DFU can't load, so keep the old value.
+  const toInt = (value: unknown, fallback: number) =>
+    typeof value === 'number' && Number.isFinite(value) ? Math.trunc(value) : fallback;
+
   const processRowUpdate = (newRow: BankAccount, oldRow: BankAccount) => {
-    if (newRow.accountGold !== oldRow.accountGold || newRow.loanTotal !== oldRow.loanTotal) {
-      updateBankAccount(newRow.regionIndex, {
-        accountGold: newRow.accountGold,
-        loanTotal: newRow.loanTotal
-      });
+    const accountGold = toInt(newRow.accountGold, oldRow.accountGold);
+    const loanTotal = toInt(newRow.loanTotal, oldRow.loanTotal);
+    if (accountGold !== oldRow.accountGold || loanTotal !== oldRow.loanTotal) {
+      updateBankAccount(newRow.regionIndex, { accountGold, loanTotal });
     }
-    return newRow;
+    return { ...newRow, accountGold, loanTotal };
   };
 
   const handleProcessRowUpdateError = (error: Error) => {
