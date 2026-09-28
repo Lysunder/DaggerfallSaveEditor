@@ -4,6 +4,7 @@ import {
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { useSaveStore } from '../store/useSaveStore';
+import { SECONDS_PER_HOUR, formatGameTime } from '../utils/daggerfallDate';
 
 // DaggerfallWorkshop.WeatherType
 const WEATHER_OPTIONS = [
@@ -52,8 +53,9 @@ export const LocationAndWorldData = () => {
     updatePlayerPosition({ insideDungeon: false });
   };
 
+  // gameTime is in seconds (DaggerfallDateTime), so an hour is 3600.
   const handleTimeAdvance = (hours: number) => {
-    updateGameTime(hours * 720);
+    updateGameTime(hours * SECONDS_PER_HOUR);
   };
 
   return (
@@ -268,12 +270,17 @@ export const LocationAndWorldData = () => {
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
             <AccessTimeIcon color="action" sx={{ mr: 1 }} />
-            <Typography variant="body1">
-              Raw Game Time: <strong>{dateAndTime.gameTime}</strong> ticks
-            </Typography>
+            <Box>
+              <Typography variant="body1">
+                <strong>{formatGameTime(dateAndTime.gameTime, true)}</strong>
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Raw game time: {dateAndTime.gameTime} seconds
+              </Typography>
+            </Box>
           </Box>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Use the helpers below to easily shift in-game time without recalculating ticks. (1 hr = 720 ticks)
+            Use the helpers below to shift in-game time without calculating seconds by hand.
           </Typography>
           
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
+import type { LoadedSave, SaveInfo } from '../../electron/saveTypes';
 
 interface Stats {
   Strength: number;
@@ -278,8 +279,10 @@ interface SaveStore {
   factionData: any | null;
   questData: QuestMachineData | null;
   notebookData: NotebookData | null;
+  /** SaveInfo.txt from the save folder (character and save name), if present. */
+  saveInfo: SaveInfo | null;
   currentFilePath: string | null;
-  loadSaveData: (path: string, data: SaveGameData, factionData?: any, questData?: QuestMachineData, notebookData?: NotebookData) => void;
+  loadSaveData: (save: LoadedSave) => void;
   updatePlayerField: (field: keyof Omit<PlayerEntity, 'stats' | 'skills' | 'careerTemplate'>, value: number | string) => void;
   updateCareerField: (field: keyof DFCareer, value: any) => void;
   updateStat: (stat: keyof Stats, value: number) => void;
@@ -306,15 +309,17 @@ export const useSaveStore = create<SaveStore>()(
     factionData: null,
     questData: null,
     notebookData: null,
+    saveInfo: null,
     currentFilePath: null,
 
-    loadSaveData: (path, data, factionData, questData, notebookData) =>
+    loadSaveData: (save) =>
       set((state) => {
-        state.currentFilePath = path;
-        state.saveData = data;
-        state.factionData = factionData || null;
-        state.questData = questData || null;
-        state.notebookData = notebookData || null;
+        state.currentFilePath = save.filePath;
+        state.saveData = save.data;
+        state.factionData = save.factionData || null;
+        state.questData = save.questData || null;
+        state.notebookData = save.notebookData || null;
+        state.saveInfo = save.saveInfo || null;
       }),
 
     updatePlayerField: (field, value) =>
@@ -486,6 +491,7 @@ export const useSaveStore = create<SaveStore>()(
         state.factionData = null;
         state.questData = null;
         state.notebookData = null;
+        state.saveInfo = null;
         state.currentFilePath = null;
       }),
   }))

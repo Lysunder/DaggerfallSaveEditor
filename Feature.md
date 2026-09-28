@@ -2,6 +2,11 @@
 
 ## Features
 
+### 💾 Save Browser
+- **Save List**: Browse your Daggerfall Unity saves by character, newest first, with each save's screenshot, name, in-game date and the real date it was saved. Search by character or save name, then click a save to open it.
+- **Save Locations**: Finds the default Daggerfall Unity save folder automatically and follows a custom save path set in DFU's `settings.ini`. Portable installs are supported: point the editor at the install folder once, and it resolves the saves the same way DFU does. You can also add any folder of saves, and show or hide saves by location.
+- **Open File**: Opening a `SaveData.txt` directly is still available.
+
 ### 👤 Character & Core Data
 - **Basic Information**: Edit character Name, Level, and Base Health.
 - **Vitals**: Modify current and maximum Health, Magicka, and Fatigue.
@@ -36,7 +41,7 @@
 ### 🗺️ Location & World Data
 - **Positioning**: Edit player world coordinates (X, Y, Z) and orientation (Yaw, Pitch).
 - **Environment Status**: Toggle whether the player is currently inside a dungeon, building, tavern, or residence.
-- **Time Management**: Alter the current in-game time and date.
+- **Time Management**: See the current in-game date and time, and move it forward or back by hours or days.
 - **Discovery**: Edit or manipulate building discovery data (e.g., revealing buildings in towns).
 
 ### 📜 Quests & Global Variables
@@ -53,7 +58,12 @@
 ### Version 1.0.8
 
 ✨ **New Features & Improvements:**
+- **Save Browser**: Pick a save from a list of your Daggerfall Unity saves, with screenshots and dates, instead of finding `SaveData.txt` in a file dialog. Supports portable installs and custom save folders.
+- **In-Game Date**: The Location & World Data section now shows the in-game date and time (e.g. "22nd of Last Seed, 3E405, 13:30").
 - **Version Display**: The app's version number is now shown next to the title.
+
+🐛 **Bug Fixes:**
+- **Time Shifting**: The hour and day buttons moved the clock by the wrong amount ("+1 Hour" added 12 minutes). They now move it by exactly one hour or one day.
 
 ### Version 1.0.7
 

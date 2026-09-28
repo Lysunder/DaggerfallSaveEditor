@@ -2,6 +2,18 @@ import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import {
+  currentEnv,
+  findEnclosingPortableInstall,
+  findInstallBaseDir,
+  isSaveFolderInRoots,
+  listSaves,
+  readSettingsFile,
+  resolveLocations,
+  screenshotPath,
+  writeSettingsFile,
+} from './saveLocations';
+import type { AddLocationResult, LoadResult } from './saveTypes';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -59,40 +71,146 @@ function createWindow() {
   }
 }
 
+// Loads SaveData.txt plus its optional sibling files. QuestData, NotebookData and SaveInfo are read-only.
+async function loadSaveFolder(filePath: string): Promise<LoadResult> {
+  try {
+    const data = JSON.parse(await fs.readFile(filePath, 'utf-8'));
+
+    const dirPath = path.dirname(filePath);
+    const readSibling = async (fileName: string) => {
+      try {
+        const raw = await fs.readFile(path.join(dirPath, fileName), 'utf-8');
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    };
+    const [factionData, questData, notebookData, saveInfo] = await Promise.all([
+      readSibling('FactionData.txt'),
+      readSibling('QuestData.txt'),
+      readSibling('NotebookData.txt'),
+      readSibling('SaveInfo.txt'),
+    ]);
+
+    return { success: true, filePath, data, factionData, questData, notebookData, saveInfo };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
 // IPC Handlers
-ipcMain.handle('dialog:openSaveData', async () => {
+ipcMain.handle('dialog:openSaveData', async (): Promise<LoadResult> => {
   const { canceled, filePaths } = await dialog.showOpenDialog(win!, {
     properties: ['openFile'],
     filters: [{ name: 'Saves', extensions: ['txt', 'json'] }]
   });
   if (!canceled && filePaths.length > 0) {
-    try {
-      const filePath = filePaths[0];
-      const rawData = await fs.readFile(filePath, 'utf-8');
-      const parsedData = JSON.parse(rawData);
-
-      // Sibling save files; each is optional. QuestData and NotebookData are read-only.
-      const dirPath = path.dirname(filePath);
-      const readSibling = async (fileName: string) => {
-        try {
-          const raw = await fs.readFile(path.join(dirPath, fileName), 'utf-8');
-          return JSON.parse(raw);
-        } catch {
-          return null;
-        }
-      };
-      const [factionData, questData, notebookData] = await Promise.all([
-        readSibling('FactionData.txt'),
-        readSibling('QuestData.txt'),
-        readSibling('NotebookData.txt'),
-      ]);
-
-      return { success: true, filePath, data: parsedData, factionData, questData, notebookData };
-    } catch (error: any) {
-      return { success: false, error: error.message };
-    }
+    return loadSaveFolder(filePaths[0]);
   }
   return { success: false, canceled: true };
+});
+
+// Save browser. Locations the user adds are kept in the editor's own settings, not DFU's.
+const settingsFile = () => path.join(app.getPath('userData'), 'settings.json');
+
+async function scanLocations() {
+  return resolveLocations(await readSettingsFile(settingsFile()), currentEnv());
+}
+
+// Only SAVE<n> folders inside a currently resolved saves root may be read.
+async function assertSaveFolder(folder: string) {
+  const roots = (await scanLocations()).flatMap((location) => (location.root ? [location.root] : []));
+  if (!isSaveFolderInRoots(folder, roots)) {
+    throw new Error('That folder is not inside a known save location.');
+  }
+}
+
+async function pickFolder(title: string, allowAppBundles = false) {
+  const properties: Electron.OpenDialogOptions['properties'] = ['openDirectory'];
+  // On macOS an app bundle is a package, so it's only selectable as a file.
+  if (allowAppBundles && process.platform === 'darwin') properties.push('openFile');
+  const { canceled, filePaths } = await dialog.showOpenDialog(win!, { title, properties });
+  return canceled || filePaths.length === 0 ? null : filePaths[0];
+}
+
+async function addPortableInstall(baseDir: string, message?: string): Promise<AddLocationResult> {
+  const settings = await readSettingsFile(settingsFile());
+  if (!settings.portableInstalls.includes(baseDir)) {
+    settings.portableInstalls.push(baseDir);
+    await writeSettingsFile(settingsFile(), settings);
+  }
+  const location = (await resolveLocations(settings, currentEnv())).find((l) => l.id === `portable:${baseDir}`);
+  return { location, message: message ?? (location?.root ? undefined : location?.warning) };
+}
+
+ipcMain.handle('saves:scan', async () => {
+  const locations = await scanLocations();
+  const saves = (await Promise.all(locations.map(listSaves))).flat();
+  return { locations, saves };
+});
+
+ipcMain.handle('saves:addInstall', async (): Promise<AddLocationResult> => {
+  const picked = await pickFolder('Choose your Daggerfall Unity install folder', true);
+  if (!picked) return { canceled: true };
+
+  const install = await findInstallBaseDir(picked);
+  if (!install) {
+    return { error: `${picked} doesn't look like a Daggerfall Unity install (no Portable.txt and no *_Data folder).` };
+  }
+  if (install.portable) {
+    return addPortableInstall(install.baseDir);
+  }
+
+  const settings = await readSettingsFile(settingsFile());
+  settings.regularInstallDir = install.baseDir;
+  await writeSettingsFile(settingsFile(), settings);
+  return {
+    message: "This install isn't portable, so it keeps its saves in the default location. The editor will use this folder to resolve a relative save path in DFU's settings.ini.",
+  };
+});
+
+ipcMain.handle('saves:addFolder', async (): Promise<AddLocationResult> => {
+  const picked = await pickFolder('Choose a folder with Daggerfall Unity saves');
+  if (!picked) return { canceled: true };
+
+  const portableInstall = await findEnclosingPortableInstall(picked);
+  if (portableInstall) {
+    return addPortableInstall(portableInstall, `This folder belongs to the portable install at ${portableInstall}, so it was added as that install.`);
+  }
+
+  const settings = await readSettingsFile(settingsFile());
+  if (!settings.folders.includes(picked)) {
+    settings.folders.push(picked);
+    await writeSettingsFile(settingsFile(), settings);
+  }
+  const location = (await resolveLocations(settings, currentEnv())).find((l) => l.id === `folder:${picked}`);
+  return { location };
+});
+
+ipcMain.handle('saves:removeLocation', async (_event, id: string) => {
+  const settings = await readSettingsFile(settingsFile());
+  settings.portableInstalls = settings.portableInstalls.filter((dir) => `portable:${dir}` !== id);
+  settings.folders = settings.folders.filter((dir) => `folder:${dir}` !== id);
+  await writeSettingsFile(settingsFile(), settings);
+});
+
+ipcMain.handle('saves:screenshot', async (_event, folder: string) => {
+  await assertSaveFolder(folder);
+  try {
+    const image = await fs.readFile(screenshotPath(folder));
+    return `data:image/jpeg;base64,${image.toString('base64')}`;
+  } catch {
+    return null;
+  }
+});
+
+ipcMain.handle('saves:load', async (_event, folder: string): Promise<LoadResult> => {
+  try {
+    await assertSaveFolder(folder);
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+  return loadSaveFolder(path.join(folder, 'SaveData.txt'));
 });
 
 async function backupFile(filePath: string) {

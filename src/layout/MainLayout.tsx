@@ -1,35 +1,27 @@
-import { Box, AppBar, CssBaseline, Toolbar, Typography, Button } from '@mui/material';
+import { useState } from 'react';
+import { Box, AppBar, CssBaseline, Toolbar, Typography, Button, Dialog, DialogContent, DialogActions, Tooltip } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import SaveIcon from '@mui/icons-material/Save';
+import ListIcon from '@mui/icons-material/List';
 
 import { useSaveStore } from '../store/useSaveStore';
 import { useNotification } from '../context/NotificationContext';
+import { useSaveLoader } from '../hooks/useSaveLoader';
+import { SaveBrowser } from '../components/SaveBrowser';
 
 export default function MainLayout() {
   const currentFilePath = useSaveStore((state) => state.currentFilePath);
   const saveData = useSaveStore((state) => state.saveData);
-  const loadSaveData = useSaveStore((state) => state.loadSaveData);
+  const saveInfo = useSaveStore((state) => state.saveInfo);
   const { showNotification } = useNotification();
-
-  const handleOpenFile = async () => {
-    try {
-      const result = await window.ipcRenderer.openSaveData();
-      if (result.success && result.filePath && result.data) {
-        loadSaveData(result.filePath, result.data, result.factionData, result.questData, result.notebookData);
-        showNotification(`Successfully loaded ${result.filePath}`, 'success');
-      } else if (!result.success && !result.canceled) {
-        showNotification(`Failed to open save data: ${result.error}`, 'error');
-      }
-    } catch (error: any) {
-      showNotification(`An unexpected error occurred: ${error.message}`, 'error');
-    }
-  };
+  const { openFile } = useSaveLoader();
+  const [browserOpen, setBrowserOpen] = useState(false);
 
   const handleSaveFile = async () => {
     if (!currentFilePath || !saveData) return;
-    
+
     try {
       const factionData = useSaveStore.getState().factionData;
       const result = await window.ipcRenderer.saveData(currentFilePath, saveData, factionData);
@@ -43,6 +35,12 @@ export default function MainLayout() {
     }
   };
 
+  const currentSaveLabel = !currentFilePath
+    ? 'No save loaded'
+    : saveInfo
+      ? `Editing: ${saveInfo.characterName} – ${saveInfo.saveName}`
+      : `Editing: ${currentFilePath}`;
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
@@ -54,11 +52,19 @@ export default function MainLayout() {
               v{__APP_VERSION__}
             </Typography>
           </Typography>
-          <Typography variant="body2" sx={{ mr: 2 }}>
-            {currentFilePath ? `Editing: ${currentFilePath}` : 'No save loaded'}
-          </Typography>
-          <Button color="inherit" startIcon={<FolderOpenIcon />} onClick={handleOpenFile}>
-            Open
+          <Tooltip title={currentFilePath ?? ''}>
+            <Typography variant="body2" noWrap sx={{ mr: 2, maxWidth: 360 }}>
+              {currentSaveLabel}
+            </Typography>
+          </Tooltip>
+          {/* Without a save loaded, the browser is already on the page. */}
+          {saveData && (
+            <Button color="inherit" startIcon={<ListIcon />} onClick={() => setBrowserOpen(true)}>
+              Saves
+            </Button>
+          )}
+          <Button color="inherit" startIcon={<FolderOpenIcon />} onClick={openFile}>
+            Open file…
           </Button>
           <Button color="inherit" startIcon={<SaveIcon />} onClick={handleSaveFile} disabled={!currentFilePath}>
             Save
@@ -69,6 +75,15 @@ export default function MainLayout() {
         <Toolbar />
         <Outlet />
       </Box>
+
+      <Dialog open={browserOpen} onClose={() => setBrowserOpen(false)} fullWidth maxWidth="md">
+        <DialogContent>
+          <SaveBrowser onLoaded={() => setBrowserOpen(false)} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBrowserOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
