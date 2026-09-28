@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Electron desktop app for editing **Daggerfall Unity** save files (`SaveData.txt` and the sibling `FactionData.txt`, both JSON despite the `.txt` extension). Stack: Electron + React 19 + TypeScript + Vite + MUI + Zustand (with Immer middleware). Sample saves for manual testing live in `example/`.
+Electron desktop app for editing **Daggerfall Unity** save files (`SaveData.txt` and the sibling `FactionData.txt`, both JSON despite the `.txt` extension). Stack: Electron + React 19 + TypeScript + Vite + MUI + Zustand (with Immer middleware). Sample saves for manual testing live in `example/`, which is git-ignored and local only.
 
 ## Commands
 
@@ -13,7 +13,7 @@ Electron desktop app for editing **Daggerfall Unity** save files (`SaveData.txt`
 - `npm run build:dist` — package installers with electron-builder into `release/` (run `npm run build` first). `npm run build:pack` produces an unpacked dir instead.
 - `npm run lint` — oxlint (config in `.oxlintrc.json`; `react/rules-of-hooks` is an error).
 
-There is no test suite. Verify changes with `npm run build` (type-check) and `npm run lint`, and by loading `example/SaveData.txt` in the running app.
+There is no test suite. Verify changes with `npm run build` (type-check) and `npm run lint`, and by loading a save (e.g. a local `example/SaveData.txt`) in the running app.
 
 CI (`.github/workflows/build.yml`) builds on Windows/Linux/macOS for pushes to `master` and tags; tag builds upload to a draft GitHub Release. The version in `package.json` drives release naming; user-facing changes are recorded in `Feature.md` (feature list + changelog).
 
