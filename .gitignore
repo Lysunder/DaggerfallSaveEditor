@@ -27,3 +27,6 @@ dist-electron
 /src/example
 /release
 /example
+
+/CLAUDE.md
+/docs
