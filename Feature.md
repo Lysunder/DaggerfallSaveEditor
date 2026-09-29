@@ -2,6 +2,18 @@
 
 ## Features
 
+### 💾 Save Browser
+- **Save List**: Browse your Daggerfall Unity saves by character, newest first, with each save's screenshot, name, in-game date and the real date it was saved. Search by character or save name, then click a save to open it.
+- **Save Locations**: Finds the default Daggerfall Unity save folder automatically and follows a custom save path set in DFU's `settings.ini`. Portable installs are supported: point the editor at the install folder once, and it resolves the saves the same way DFU does. You can also add any folder of saves, and show or hide saves by location.
+- **Open File**: Opening a `SaveData.txt` directly is still available.
+
+### 📝 Unsaved Changes
+- **Change Indicator**: The toolbar shows how many unsaved changes you have, and the window title gets a `*`. **Save** is only enabled when there's something to save.
+- **Change List**: Click the indicator to see every change grouped by section, in plain language with old and new values (e.g. "Strength: 55 → 70", "Removed: Silver Longsword").
+- **Revert**: Undo any single change, or all changes to one item or faction at once. A deleted item comes back in its old place and equipment slot. **Discard all changes** undoes everything.
+- **No Lost Edits**: Opening another save or closing the app with unsaved changes asks first, with the option to save.
+- **Smaller Saves**: Only the files you changed are written and backed up.
+
 ### 👤 Character & Core Data
 - **Basic Information**: Edit character Name, Level, and Base Health.
 - **Vitals**: Modify current and maximum Health, Magicka, and Fatigue.
@@ -36,7 +48,7 @@
 ### 🗺️ Location & World Data
 - **Positioning**: Edit player world coordinates (X, Y, Z) and orientation (Yaw, Pitch).
 - **Environment Status**: Toggle whether the player is currently inside a dungeon, building, tavern, or residence.
-- **Time Management**: Alter the current in-game time and date.
+- **Time Management**: See the current in-game date and time, and move it forward or back by hours or days.
 - **Discovery**: Edit or manipulate building discovery data (e.g., revealing buildings in towns).
 
 ### 📜 Quests & Global Variables
@@ -53,7 +65,19 @@
 ### Version 1.0.8
 
 ✨ **New Features & Improvements:**
+- **Save Browser**: Pick a save from a list of your Daggerfall Unity saves, with screenshots and dates, instead of finding `SaveData.txt` in a file dialog. Supports portable installs and custom save folders.
+- **Unsaved Changes**: See what you've changed before saving, revert individual changes, and get a warning before unsaved edits would be lost.
+- **In-Game Date**: The Location & World Data section now shows the in-game date and time (e.g. "22nd of Last Seed, 3E405, 13:30").
 - **Version Display**: The app's version number is now shown next to the title.
+
+🐛 **Bug Fixes:**
+- **Saves That Wouldn't Load**: Choosing more than one forbidden material, shield, armor or proficiency wrote the value in a form Daggerfall Unity can't read (`Iron, Steel` instead of `Iron,Steel`), so the game refused to load the save. The editor now writes it correctly. Opening a save affected by this repairs it automatically; save to write the fix.
+- **Enum Values**: Weather, world context and building type are now written by name, exactly as the game writes them. Building type is a dropdown instead of free text, and building quality only accepts whole numbers, since a typo in either could also stop a save loading.
+- **Time Shifting**: The hour and day buttons moved the clock by the wrong amount ("+1 Hour" added 12 minutes). They now move it by exactly one hour or one day.
+- **Position Fields**: Clearing a coordinate, yaw, pitch or world position field (for example, to type a new value) and then saving wrote an empty value that Daggerfall Unity can't load. Empty or partial input is now ignored, and the field keeps its last valid value.
+- **Bank Accounts**: Clearing an Account Balance or Loan Total cell wrote an empty value that Daggerfall Unity can't load. An emptied cell now keeps its previous value, and balances are stored as whole numbers.
+- **Quest Flag Index**: The index shown next to each global variable was its position in the filtered list rather than its real index, so it changed while searching or filtering.
+- **Inventory Filter**: A category filter chosen on the Inventory tab carried over to the Wagon tab, which could hide every wagon item. Switching tabs now resets the filter.
 
 ### Version 1.0.7
 

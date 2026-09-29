@@ -6,23 +6,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { useSaveStore } from '../store/useSaveStore';
 import type { BankAccount } from '../store/useSaveStore';
-
-const REGION_NAMES: Record<number, string> = {
-  0: "Alik'r Desert", 1: "Dragontail Mountains", 2: "Glenpoint Foothills", 3: "Daggerfall Bluffs",
-  4: "Yeorth Burrowland", 5: "Dwynnen", 6: "Ravennian Mountains", 7: "Wrothgarian Mountains",
-  8: "Forsaken Wastes", 9: "Betony", 10: "Sentinelian Mountains", 11: "Tigonus", 12: "Kozanset",
-  13: "Gavaudon", 14: "Tulune", 15: "Glenumbra Moors", 16: "Ilessan Hills", 17: "Daggerfall",
-  18: "Shalgora", 19: "Kambria", 20: "Sentinel", 21: "Anticlere", 22: "Lainlyn", 23: "Wayrest",
-  24: "GenTemHighRock", 25: "GenTemHammerfell", 26: "Orsinium Area", 27: "Skeffington Wood",
-  28: "Hammerfell bay", 29: "Hammerfell coast", 30: "High Rock bay", 31: "High Rock sea",
-  32: "Iliac Bay", 33: "Shalgora", 34: "Wrothgarian Mountains", 35: "Dragontail", 36: "Wayrest",
-  37: "Orsinium", 38: "Daggerfall", 39: "Sentinel", 40: "Glenpoint", 41: "Betony",
-  42: "Sentinelian Mountains", 43: "Tigonus", 44: "Kozanset", 45: "Gavaudon", 46: "Tulune",
-  47: "Glenumbra Moors", 48: "Ilessan Hills", 49: "Shalgora", 50: "Kambria", 51: "Anticlere",
-  52: "Lainlyn", 53: "Wayrest", 54: "Skeffington Wood", 55: "Alik'r Desert", 56: "Dragontail Mountains",
-  57: "Glenpoint Foothills", 58: "Daggerfall Bluffs", 59: "Yeorth Burrowland", 60: "Dwynnen",
-  61: "Ravennian Mountains",
-};
+import { REGION_NAMES } from '../data/regions';
 
 export const FinancesAndBanking = () => {
   const saveData = useSaveStore((state) => state.saveData);
@@ -44,14 +28,17 @@ export const FinancesAndBanking = () => {
     }
   };
 
+  // Both are C# ints in DFU. An emptied cell arrives as null, which DFU can't load, so keep the old value.
+  const toInt = (value: unknown, fallback: number) =>
+    typeof value === 'number' && Number.isFinite(value) ? Math.trunc(value) : fallback;
+
   const processRowUpdate = (newRow: BankAccount, oldRow: BankAccount) => {
-    if (newRow.accountGold !== oldRow.accountGold || newRow.loanTotal !== oldRow.loanTotal) {
-      updateBankAccount(newRow.regionIndex, {
-        accountGold: newRow.accountGold,
-        loanTotal: newRow.loanTotal
-      });
+    const accountGold = toInt(newRow.accountGold, oldRow.accountGold);
+    const loanTotal = toInt(newRow.loanTotal, oldRow.loanTotal);
+    if (accountGold !== oldRow.accountGold || loanTotal !== oldRow.loanTotal) {
+      updateBankAccount(newRow.regionIndex, { accountGold, loanTotal });
     }
-    return newRow;
+    return { ...newRow, accountGold, loanTotal };
   };
 
   const handleProcessRowUpdateError = (error: Error) => {

@@ -137,7 +137,14 @@ export const InventoryManager: React.FC = () => {
   return (
     <Paper sx={{ p: 3, borderRadius: 2, display: 'flex', flexDirection: 'column', gap: 2, height: 600 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Tabs value={tabIndex} onChange={(_, v) => setTabIndex(v)}>
+        <Tabs
+          value={tabIndex}
+          onChange={(_, v) => {
+            setTabIndex(v);
+            // Categories differ per tab; a leftover filter could hide every item.
+            setCategoryFilter('All');
+          }}
+        >
           <Tab label="Inventory" />
           <Tab label="Wagon" />
         </Tabs>

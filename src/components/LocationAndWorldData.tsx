@@ -4,33 +4,16 @@ import {
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { useSaveStore } from '../store/useSaveStore';
+import { SECONDS_PER_HOUR, formatGameTime } from '../utils/daggerfallDate';
+import { BUILDING_TYPES, WEATHER_TYPES, WORLD_CONTEXTS, buildingTypeName, weatherName, worldContextName } from '../data/dfuEnums';
 
-// DaggerfallWorkshop.WeatherType
-const WEATHER_OPTIONS = [
-  { value: 0, label: 'Sunny' },
-  { value: 1, label: 'Cloudy' },
-  { value: 2, label: 'Overcast' },
-  { value: 3, label: 'Fog' },
-  { value: 4, label: 'Rain' },
-  { value: 5, label: 'Thunder' },
-  { value: 6, label: 'Snow' }
-];
+// Selects store DFU's enum member names, which is how the game writes these fields.
+const spaced = (name: string) => name.replace(/([a-z])([A-Z0-9])/g, '$1 $2');
 
-// DaggerfallWorkshop.Game.WorldContext
-const WORLD_CONTEXT_OPTIONS = [
-  { value: 0, label: 'Nothing / Null' },
-  { value: 1, label: 'Exterior' },
-  { value: 2, label: 'Interior' },
-  { value: 3, label: 'Dungeon' }
-];
-
-const resolveEnum = (val: any, options: { value: number, label: string }[], fallback: number) => {
-  if (typeof val === 'string') {
-    // Attempt to match the label
-    const opt = options.find(o => o.label.toLowerCase() === val.toLowerCase() || o.label.split(' / ')[0].toLowerCase() === val.toLowerCase());
-    if (opt) return opt.value;
-  }
-  return typeof val === 'number' ? val : fallback;
+// Ignores empty or partial input ("", "-"): NaN would be saved as null, which DFU can't load.
+const withNumber = (raw: string, parse: (text: string) => number, apply: (value: number) => void) => {
+  const value = parse(raw);
+  if (Number.isFinite(value)) apply(value);
 };
 
 export const LocationAndWorldData = () => {
@@ -52,8 +35,9 @@ export const LocationAndWorldData = () => {
     updatePlayerPosition({ insideDungeon: false });
   };
 
+  // gameTime is in seconds (DaggerfallDateTime), so an hour is 3600.
   const handleTimeAdvance = (hours: number) => {
-    updateGameTime(hours * 720);
+    updateGameTime(hours * SECONDS_PER_HOUR);
   };
 
   return (
@@ -86,7 +70,7 @@ export const LocationAndWorldData = () => {
               size="small"
               fullWidth
               value={playerPosition.position?.x ?? 0}
-              onChange={(e) => updatePlayerPositionCoords({ x: parseFloat(e.target.value) })}
+              onChange={(e) => withNumber(e.target.value, parseFloat, (x) => updatePlayerPositionCoords({ x }))}
               slotProps={{ htmlInput: { step: "0.01" } }}
             />
             <TextField
@@ -95,7 +79,7 @@ export const LocationAndWorldData = () => {
               size="small"
               fullWidth
               value={playerPosition.position?.y ?? 0}
-              onChange={(e) => updatePlayerPositionCoords({ y: parseFloat(e.target.value) })}
+              onChange={(e) => withNumber(e.target.value, parseFloat, (y) => updatePlayerPositionCoords({ y }))}
               slotProps={{ htmlInput: { step: "0.01" } }}
             />
             <TextField
@@ -104,7 +88,7 @@ export const LocationAndWorldData = () => {
               size="small"
               fullWidth
               value={playerPosition.position?.z ?? 0}
-              onChange={(e) => updatePlayerPositionCoords({ z: parseFloat(e.target.value) })}
+              onChange={(e) => withNumber(e.target.value, parseFloat, (z) => updatePlayerPositionCoords({ z }))}
               slotProps={{ htmlInput: { step: "0.01" } }}
             />
           </Box>
@@ -115,7 +99,7 @@ export const LocationAndWorldData = () => {
               size="small"
               fullWidth
               value={playerPosition.yaw ?? 0}
-              onChange={(e) => updatePlayerPosition({ yaw: parseFloat(e.target.value) })}
+              onChange={(e) => withNumber(e.target.value, parseFloat, (yaw) => updatePlayerPosition({ yaw }))}
               slotProps={{ htmlInput: { step: "0.01" } }}
             />
             <TextField
@@ -124,7 +108,7 @@ export const LocationAndWorldData = () => {
               size="small"
               fullWidth
               value={playerPosition.pitch ?? 0}
-              onChange={(e) => updatePlayerPosition({ pitch: parseFloat(e.target.value) })}
+              onChange={(e) => withNumber(e.target.value, parseFloat, (pitch) => updatePlayerPosition({ pitch }))}
               slotProps={{ htmlInput: { step: "0.01" } }}
             />
           </Box>
@@ -139,7 +123,7 @@ export const LocationAndWorldData = () => {
               size="small"
               fullWidth
               value={playerPosition.worldPosX ?? 0}
-              onChange={(e) => updatePlayerPosition({ worldPosX: parseInt(e.target.value) })}
+              onChange={(e) => withNumber(e.target.value, parseInt, (worldPosX) => updatePlayerPosition({ worldPosX }))}
             />
             <TextField
               label="World Pos Z"
@@ -147,7 +131,7 @@ export const LocationAndWorldData = () => {
               size="small"
               fullWidth
               value={playerPosition.worldPosZ ?? 0}
-              onChange={(e) => updatePlayerPosition({ worldPosZ: parseInt(e.target.value) })}
+              onChange={(e) => withNumber(e.target.value, parseInt, (worldPosZ) => updatePlayerPosition({ worldPosZ }))}
             />
           </Box>
         </Grid>
@@ -163,12 +147,12 @@ export const LocationAndWorldData = () => {
               <InputLabel id="weather-select-label">Weather</InputLabel>
               <Select
                 labelId="weather-select-label"
-                value={resolveEnum(playerPosition.weather, WEATHER_OPTIONS, 0)}
+                value={weatherName(playerPosition.weather) ?? ''}
                 label="Weather"
-                onChange={(e) => updatePlayerPosition({ weather: Number(e.target.value) })}
+                onChange={(e) => updatePlayerPosition({ weather: e.target.value })}
               >
-                {WEATHER_OPTIONS.map(w => (
-                  <MenuItem key={w.value} value={w.value}>{w.label}</MenuItem>
+                {WEATHER_TYPES.map(w => (
+                  <MenuItem key={w.name} value={w.name}>{w.name}</MenuItem>
                 ))}
               </Select>
             </FormControl>
@@ -177,12 +161,12 @@ export const LocationAndWorldData = () => {
               <InputLabel id="world-context-label">World Context</InputLabel>
               <Select
                 labelId="world-context-label"
-                value={resolveEnum(playerPosition.worldContext, WORLD_CONTEXT_OPTIONS, 1)}
+                value={worldContextName(playerPosition.worldContext) ?? ''}
                 label="World Context"
-                onChange={(e) => updatePlayerPosition({ worldContext: Number(e.target.value) })}
+                onChange={(e) => updatePlayerPosition({ worldContext: e.target.value })}
               >
-                {WORLD_CONTEXT_OPTIONS.map(c => (
-                  <MenuItem key={c.value} value={c.value}>{c.label}</MenuItem>
+                {WORLD_CONTEXTS.map(c => (
+                  <MenuItem key={c.name} value={c.name}>{c.name}</MenuItem>
                 ))}
               </Select>
             </FormControl>
@@ -237,24 +221,30 @@ export const LocationAndWorldData = () => {
               onChange={(e) => updateBuildingDiscoveryData({ displayName: e.target.value })}
             />
             <Stack direction="row" spacing={2}>
-              <TextField
-                label="Building Type"
-                size="small"
-                fullWidth
-                value={playerPosition.buildingDiscoveryData?.buildingType ?? 0}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  updateBuildingDiscoveryData({ buildingType: isNaN(Number(val)) ? val : Number(val) });
-                }}
-              />
+              <FormControl fullWidth size="small">
+                <InputLabel id="building-type-label">Building Type</InputLabel>
+                <Select
+                  labelId="building-type-label"
+                  label="Building Type"
+                  value={buildingTypeName(playerPosition.buildingDiscoveryData?.buildingType) ?? ''}
+                  onChange={(e) => updateBuildingDiscoveryData({ buildingType: e.target.value })}
+                >
+                  {BUILDING_TYPES.map(b => (
+                    <MenuItem key={b.name} value={b.name}>{spaced(b.name)}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              {/* quality is a C# int in DFU; anything else would stop the save loading. */}
               <TextField
                 label="Quality"
                 size="small"
                 fullWidth
+                type="number"
                 value={playerPosition.buildingDiscoveryData?.quality ?? 0}
+                slotProps={{ htmlInput: { step: 1 } }}
                 onChange={(e) => {
-                  const val = e.target.value;
-                  updateBuildingDiscoveryData({ quality: isNaN(Number(val)) ? val : Number(val) });
+                  const val = parseInt(e.target.value, 10);
+                  if (!isNaN(val)) updateBuildingDiscoveryData({ quality: val });
                 }}
               />
             </Stack>
@@ -268,12 +258,17 @@ export const LocationAndWorldData = () => {
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
             <AccessTimeIcon color="action" sx={{ mr: 1 }} />
-            <Typography variant="body1">
-              Raw Game Time: <strong>{dateAndTime.gameTime}</strong> ticks
-            </Typography>
+            <Box>
+              <Typography variant="body1">
+                <strong>{formatGameTime(dateAndTime.gameTime, true)}</strong>
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Raw game time: {dateAndTime.gameTime} seconds
+              </Typography>
+            </Box>
           </Box>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Use the helpers below to easily shift in-game time without recalculating ticks. (1 hr = 720 ticks)
+            Use the helpers below to shift in-game time without calculating seconds by hand.
           </Typography>
           
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>

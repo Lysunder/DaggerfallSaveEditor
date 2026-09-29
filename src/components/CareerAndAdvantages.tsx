@@ -15,6 +15,7 @@ import {
   type SelectChangeEvent
 } from '@mui/material';
 import { useSaveStore, type DFCareer, DAGGERFALL_SKILLS } from '../store/useSaveStore';
+import { CAREER_FLAG_FIELDS, formatFlags, parseFlags } from '../data/dfuEnums';
 
 export const CareerAndAdvantages: React.FC = () => {
   const saveData = useSaveStore((state) => state.saveData);
@@ -41,29 +42,16 @@ export const CareerAndAdvantages: React.FC = () => {
     updateCareerField(field, e.target.value as string);
   };
 
+  // Written in the exact form DFU reads (see src/data/dfuEnums.ts); ", " would stop the save loading.
   const handleStringFlagChange = (field: keyof DFCareer, flagStr: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const currentValue = (career[field] as string) || '';
-    const flags = currentValue ? currentValue.split(',').map(s => s.trim()).filter(s => s !== 'None' && s !== '') : [];
-    
+    const flags = parseFlags(career[field]).filter((name) => name !== flagStr);
     if (e.target.checked) {
-      if (!flags.includes(flagStr)) {
-        flags.push(flagStr);
-      }
-    } else {
-      const index = flags.indexOf(flagStr);
-      if (index > -1) {
-        flags.splice(index, 1);
-      }
+      flags.push(flagStr);
     }
-    
-    updateCareerField(field, flags.join(', '));
+    updateCareerField(field, formatFlags(flags, CAREER_FLAG_FIELDS[field as string]));
   };
 
-  const hasStringFlag = (fieldValue: string | undefined, flagStr: string) => {
-    if (!fieldValue) return false;
-    const flags = fieldValue.split(',').map(s => s.trim());
-    return flags.includes(flagStr);
-  };
+  const hasStringFlag = (fieldValue: string | undefined, flagStr: string) => parseFlags(fieldValue).includes(flagStr);
 
   return (
     <Card sx={{ mb: 3 }}>

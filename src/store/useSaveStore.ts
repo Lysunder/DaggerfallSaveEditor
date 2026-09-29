@@ -1,5 +1,9 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
+import { produce } from 'immer';
+import type { LoadedSave, SaveInfo } from '../../electron/saveTypes';
+import type { Change } from '../utils/saveDiff';
+import { revertChange as applyRevert, type RevertResult } from '../utils/revertChange';
 
 interface Stats {
   Strength: number;
@@ -187,15 +191,18 @@ interface SaveGameData {
       pitch: number;
       worldPosX: number;
       worldPosZ: number;
-      weather: number;
+      /** WeatherType name, e.g. "Overcast" (DFU writes enums by name). */
+      weather: string | number;
       insideDungeon: boolean;
       insideBuilding: boolean;
       insideTavern: boolean;
       insideResidence: boolean;
-      worldContext: number;
+      /** WorldContext name, e.g. "Exterior". */
+      worldContext: string | number;
       buildingDiscoveryData?: {
         displayName?: string;
-        buildingType?: number;
+        /** DFLocation.BuildingTypes name, e.g. "Alchemist". */
+        buildingType?: string | number;
         quality?: number;
         [key: string]: any;
       };
@@ -278,8 +285,25 @@ interface SaveStore {
   factionData: any | null;
   questData: QuestMachineData | null;
   notebookData: NotebookData | null;
+  /** SaveInfo.txt from the save folder (character and save name), if present. */
+  saveInfo: SaveInfo | null;
   currentFilePath: string | null;
-  loadSaveData: (path: string, data: SaveGameData, factionData?: any, questData?: QuestMachineData, notebookData?: NotebookData) => void;
+  /**
+   * The save and faction data as loaded or last saved. Immer never mutates them and shares
+   * untouched branches with the current data, so they cost nothing to keep. Diff against them
+   * (src/utils/saveDiff.ts) to find unsaved changes; don't use reference equality for dirty state.
+   */
+  baselineSaveData: SaveGameData | null;
+  baselineFactionData: any | null;
+  /** Values fixed on load so DFU can read them; they show as "Repaired" and survive Discard. */
+  repairs: EnumRepairEntry[];
+  loadSaveData: (save: LoadedSave) => void;
+  setRepairs: (repairs: EnumRepairEntry[]) => void;
+  /** Makes the data that was just written the new baseline. Ignored if another save was loaded meanwhile. */
+  markSaved: (filePath: string, savedData: SaveGameData, savedFactionData: any | null) => void;
+  /** Returns to the baseline, keeping load-time repairs. */
+  discardChanges: () => void;
+  revertChange: (change: Change) => RevertResult;
   updatePlayerField: (field: keyof Omit<PlayerEntity, 'stats' | 'skills' | 'careerTemplate'>, value: number | string) => void;
   updateCareerField: (field: keyof DFCareer, value: any) => void;
   updateStat: (stat: keyof Stats, value: number) => void;
@@ -300,21 +324,41 @@ interface SaveStore {
   reset: () => void;
 }
 
+export interface EnumRepairEntry {
+  /** Change id (see changeId in saveDiff.ts), used to mark the row in the change list. */
+  id: string;
+  path: string[];
+  value: unknown;
+}
+
+const setAtPath = (root: any, path: string[], value: unknown) => {
+  const parent = path.slice(0, -1).reduce((node, key) => node?.[key], root);
+  if (parent) parent[path[path.length - 1]] = value;
+};
+
 export const useSaveStore = create<SaveStore>()(
-  immer((set) => ({
+  immer((set, get) => ({
     saveData: null,
     factionData: null,
     questData: null,
     notebookData: null,
+    saveInfo: null,
     currentFilePath: null,
+    baselineSaveData: null,
+    baselineFactionData: null,
+    repairs: [],
 
-    loadSaveData: (path, data, factionData, questData, notebookData) =>
+    loadSaveData: (save) =>
       set((state) => {
-        state.currentFilePath = path;
-        state.saveData = data;
-        state.factionData = factionData || null;
-        state.questData = questData || null;
-        state.notebookData = notebookData || null;
+        state.currentFilePath = save.filePath;
+        state.saveData = save.data;
+        state.baselineSaveData = save.data;
+        state.baselineFactionData = save.factionData || null;
+        state.repairs = [];
+        state.factionData = save.factionData || null;
+        state.questData = save.questData || null;
+        state.notebookData = save.notebookData || null;
+        state.saveInfo = save.saveInfo || null;
       }),
 
     updatePlayerField: (field, value) =>
@@ -486,7 +530,53 @@ export const useSaveStore = create<SaveStore>()(
         state.factionData = null;
         state.questData = null;
         state.notebookData = null;
+        state.saveInfo = null;
         state.currentFilePath = null;
+        state.baselineSaveData = null;
+        state.baselineFactionData = null;
+        state.repairs = [];
       }),
+
+    setRepairs: (repairs) =>
+      set((state) => {
+        state.repairs = repairs;
+      }),
+
+    markSaved: (filePath, savedData, savedFactionData) =>
+      set((state) => {
+        if (state.currentFilePath !== filePath) return;
+        state.baselineSaveData = savedData;
+        state.baselineFactionData = savedFactionData;
+        state.repairs = [];
+      }),
+
+    discardChanges: () => {
+      // Built outside the store's draft so the baseline itself is never modified.
+      const { baselineSaveData, baselineFactionData, repairs } = get();
+      // Repairs aren't user edits: discarding them would bring back values DFU can't load.
+      const restored = baselineSaveData && repairs.length > 0
+        ? produce(baselineSaveData, (draft) => {
+            for (const repair of repairs) setAtPath(draft, repair.path, repair.value);
+          })
+        : baselineSaveData;
+      set((state) => {
+        state.saveData = restored;
+        state.factionData = baselineFactionData;
+      });
+    },
+
+    revertChange: (change) => {
+      // Baselines are read outside the draft so re-inserted records are the original objects.
+      const { baselineSaveData, baselineFactionData } = get();
+      let result: RevertResult = { applied: false, occupiedSlots: [] };
+      set((state) => {
+        if (change.file === 'save' && state.saveData) {
+          result = applyRevert(state.saveData, baselineSaveData, change);
+        } else if (change.file === 'faction' && state.factionData) {
+          result = applyRevert(state.factionData, baselineFactionData, change);
+        }
+      });
+      return result;
+    },
   }))
 );

@@ -10,16 +10,15 @@ import { MainQuestProgress } from '../components/MainQuestProgress';
 import { FactionsAndReputation } from '../components/FactionsAndReputation';
 import { AllReputations } from '../components/AllReputations';
 import { LocationAndWorldData } from '../components/LocationAndWorldData';
+import { SaveBrowser } from '../components/SaveBrowser';
 
 export default function Home() {
   const saveData = useSaveStore((state) => state.saveData);
 
   if (!saveData || !saveData.playerData?.playerEntity) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <Typography variant="h5" color="text.secondary">
-          Please open a valid Daggerfall Unity save file to begin.
-        </Typography>
+      <Box sx={{ maxWidth: 1000, mx: 'auto' }}>
+        <SaveBrowser />
       </Box>
     );
   }

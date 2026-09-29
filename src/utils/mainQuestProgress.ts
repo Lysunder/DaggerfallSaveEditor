@@ -7,6 +7,7 @@ import {
   type MainQuestDef,
 } from '../data/mainQuest';
 import type { GlobalVar, NotebookData, QuestMachineData, QuestSaveData, QuestTaskSaveData } from '../store/useSaveStore';
+import { SECONDS_PER_DAY, formatDaggerfallDate } from './daggerfallDate';
 
 export type QuestStatus = 'completed' | 'failed' | 'active' | 'started' | 'invited' | 'available' | 'locked';
 
@@ -44,18 +45,6 @@ export interface MainQuestProgress {
 
 const START_QUEST_ACTION = 'DaggerfallWorkshop.Game.Questing.StartQuest';
 const CLOCK_RESOURCE = 'DaggerfallWorkshop.Game.Questing.Clock';
-const SECONDS_PER_DAY = 86400;
-
-const MONTH_NAMES = [
-  'Morning Star', "Sun's Dawn", 'First Seed', "Rain's Hand", 'Second Seed', 'Midyear',
-  "Sun's Height", 'Last Seed', 'Hearthfire', 'Frostfall', "Sun's Dusk", 'Evening Star',
-];
-
-const ordinal = (n: number) => {
-  const tens = n % 100;
-  if (tens >= 11 && tens <= 13) return `${n}th`;
-  return `${n}${['th', 'st', 'nd', 'rd'][n % 10] ?? 'th'}`;
-};
 
 /** Quest IDs named by every completed StartQuest action in any tracked quest. */
 export const collectStartedQuests = (quests: QuestSaveData[]): Set<string> => {
@@ -98,9 +87,7 @@ export const renderJournal = (quest: QuestSaveData): string[] => {
   for (const log of quest.activeLogMessages ?? []) {
     const message = quest.messages?.find((m) => m.id === log.messageID);
     if (!message) continue;
-    const date = log.dateTime
-      ? `${ordinal(log.dateTime.Day + 1)} of ${MONTH_NAMES[log.dateTime.Month] ?? '?'}, 3E${log.dateTime.Year}`
-      : '';
+    const date = log.dateTime ? formatDaggerfallDate(log.dateTime) : '';
     // Lines are hard-wrapped for DFU's journal panel; join them into flowing text.
     const text = message.lines
       .map((line) => line.trim())
