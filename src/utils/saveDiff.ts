@@ -80,8 +80,10 @@ const walk = (
 
   if (Array.isArray(before) && Array.isArray(after)) {
     const key = KEYED_ARRAYS[file][propertyPath(path)];
-    if (key) {
-      const keyOf = (element: unknown) => (isObject(element) ? (element[key] as string | number) : undefined);
+    const keyOf = (element: unknown) => (key && isObject(element) ? (element[key] as string | number) : undefined);
+    // Matching by key needs unique keys; with duplicates fall back to comparing by position.
+    const unique = (array: unknown[]) => new Set(array.map(keyOf)).size === array.length;
+    if (key && unique(before) && unique(after)) {
       const beforeByKey = new Map(before.map((element) => [keyOf(element), element]));
       const afterByKey = new Map(after.map((element) => [keyOf(element), element]));
       for (const [value, element] of beforeByKey) {

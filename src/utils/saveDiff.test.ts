@@ -100,3 +100,14 @@ describe('diffAll', () => {
     expect(first).toHaveLength(1);
   });
 });
+
+describe('duplicate keys', () => {
+  it('compares by position instead of collapsing duplicate uids', () => {
+    const make = (a: number, b: number) => ({
+      playerData: { playerEntity: { items: [{ uid: 1, hits1: a }, { uid: 1, hits1: b }] } },
+    });
+    const changes = diffSave(make(1, 2), make(1, 3));
+    expect(changes).toHaveLength(1);
+    expect(changes[0].after).toBe(3);
+  });
+});

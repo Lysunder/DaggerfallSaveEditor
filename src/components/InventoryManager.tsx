@@ -9,6 +9,7 @@ import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import BuildIcon from '@mui/icons-material/Build';
+import { clampInt } from '../utils/numbers';
 import { useSaveStore } from '../store/useSaveStore';
 import type { Item } from '../store/useSaveStore';
 
@@ -72,12 +73,14 @@ export const InventoryManager: React.FC = () => {
     e.preventDefault();
     if (!editItem) return;
     const formData = new FormData(e.currentTarget);
+    const int = (name: string, min = 0) => clampInt(parseInt(formData.get(name) as string, 10), min);
+    const weight = parseFloat(formData.get('weightInKg') as string);
     const updates: Partial<Item> = {
-      hits1: parseInt(formData.get('hits1') as string, 10),
-      hits2: parseInt(formData.get('hits2') as string, 10),
-      stackCount: parseInt(formData.get('stackCount') as string, 10),
-      value1: parseInt(formData.get('value1') as string, 10),
-      weightInKg: parseFloat(formData.get('weightInKg') as string)
+      hits1: int('hits1'),
+      hits2: int('hits2'),
+      stackCount: int('stackCount', 1),
+      value1: int('value1'),
+      weightInKg: Number.isFinite(weight) ? Math.max(0, weight) : editItem.weightInKg,
     };
 
     if (isInventory) {

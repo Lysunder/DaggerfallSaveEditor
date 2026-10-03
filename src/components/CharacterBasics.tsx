@@ -6,6 +6,7 @@ import {
   Grid, 
   TextField 
 } from '@mui/material';
+import { clampInt } from '../utils/numbers';
 import { useSaveStore } from '../store/useSaveStore';
 
 export const CharacterBasics: React.FC = () => {
@@ -21,7 +22,7 @@ export const CharacterBasics: React.FC = () => {
   const handleNumberChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value, 10);
     if (!isNaN(val)) {
-      updatePlayerField(field, val);
+      updatePlayerField(field, clampInt(val));
     }
   };
 

@@ -34,11 +34,13 @@ const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
 
 function createWindow() {
   win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC as string, 'electron-vite.svg'),
     width: 1200,
     height: 800,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      sandbox: true,
+      nodeIntegration: false,
     },
   });
 
@@ -50,11 +52,6 @@ function createWindow() {
       shell.openExternal(url);
     }
     return { action: 'deny' };
-  });
-
-  // Test active push message to Renderer-process.
-  win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', (new Date).toLocaleString());
   });
 
   // The renderer blocks unload (beforeunload) while there are unsaved changes; ask before closing.
@@ -73,10 +70,6 @@ function createWindow() {
     }
   });
 
-  win.webContents.on('console-message', ({ message, sourceId, lineNumber }) => {
-    console.log(`[Renderer]: ${message} (at ${sourceId}:${lineNumber})`);
-  });
-
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);
     // Open devTools automatically in development
@@ -87,10 +80,15 @@ function createWindow() {
   }
 }
 
+// Save files the user opened this session. Only these may be written back, so the renderer can't
+// ask the main process to overwrite arbitrary paths.
+const writableSaveFiles = new Set<string>();
+
 // Loads SaveData.txt plus its optional sibling files. QuestData, NotebookData and SaveInfo are read-only.
 async function loadSaveFolder(filePath: string): Promise<LoadResult> {
   try {
     const data = JSON.parse(await fs.readFile(filePath, 'utf-8'));
+    writableSaveFiles.add(path.resolve(filePath));
 
     const dirPath = path.dirname(filePath);
     const readSibling = async (fileName: string) => {
@@ -229,53 +227,62 @@ ipcMain.handle('saves:load', async (_event, folder: string): Promise<LoadResult>
   return loadSaveFolder(path.join(folder, 'SaveData.txt'));
 });
 
+// Copies an existing file to bak_<name>.<n><ext>. A missing file needs no backup; any other
+// failure throws so the original is never overwritten without one.
 async function backupFile(filePath: string) {
   try {
     await fs.access(filePath);
-    const parsedPath = path.parse(filePath);
-    
-    const files = await fs.readdir(parsedPath.dir);
-    
-    const escapedName = parsedPath.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const escapedExt = parsedPath.ext.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const backupRegex = new RegExp(`^bak_${escapedName}\\.(\\d+)${escapedExt}$`);
-    
-    let maxIndex = -1;
-    for (const file of files) {
-      const match = file.match(backupRegex);
-      if (match) {
-        const index = parseInt(match[1], 10);
-        if (index > maxIndex) {
-          maxIndex = index;
-        }
-      }
-    }
-    
-    const nextIndex = maxIndex + 1;
-    const backupPath = path.join(parsedPath.dir, `bak_${parsedPath.name}.${nextIndex}${parsedPath.ext}`);
-    await fs.copyFile(filePath, backupPath);
   } catch {
-    // File doesn't exist, no need to backup
+    return;
+  }
+
+  const parsedPath = path.parse(filePath);
+  const files = await fs.readdir(parsedPath.dir);
+
+  const escapedName = parsedPath.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const escapedExt = parsedPath.ext.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const backupRegex = new RegExp(`^bak_${escapedName}\\.(\\d+)${escapedExt}$`);
+
+  let maxIndex = -1;
+  for (const file of files) {
+    const match = file.match(backupRegex);
+    if (match) {
+      maxIndex = Math.max(maxIndex, parseInt(match[1], 10));
+    }
+  }
+
+  const backupPath = path.join(parsedPath.dir, `bak_${parsedPath.name}.${maxIndex + 1}${parsedPath.ext}`);
+  await fs.copyFile(filePath, backupPath);
+}
+
+// Writes to a temp file and renames it into place, so a crash can't leave a truncated save.
+async function writeJsonAtomic(filePath: string, data: unknown) {
+  const tempPath = `${filePath}.tmp`;
+  try {
+    await fs.writeFile(tempPath, JSON.stringify(data, null, 2), 'utf-8');
+    await fs.rename(tempPath, filePath);
+  } catch (error) {
+    await fs.rm(tempPath, { force: true });
+    throw error;
   }
 }
 
 // Only the files passed are written (and backed up); null/undefined means unchanged.
 ipcMain.handle('fs:saveData', async (_event, filePath: string, data: any | null, factionData?: any) => {
   try {
+    if (typeof filePath !== 'string' || !writableSaveFiles.has(path.resolve(filePath))) {
+      throw new Error('That file was not opened in this session, so it will not be written.');
+    }
+
     if (data) {
       await backupFile(filePath);
-      const rawData = JSON.stringify(data, null, 2);
-      await fs.writeFile(filePath, rawData, 'utf-8');
+      await writeJsonAtomic(filePath, data);
     }
 
     if (factionData) {
-      const dirPath = path.dirname(filePath);
-      const factionFilePath = path.join(dirPath, 'FactionData.txt');
-      
+      const factionFilePath = path.join(path.dirname(filePath), 'FactionData.txt');
       await backupFile(factionFilePath);
-      
-      const rawFactionData = JSON.stringify(factionData, null, 2);
-      await fs.writeFile(factionFilePath, rawFactionData, 'utf-8');
+      await writeJsonAtomic(factionFilePath, factionData);
     }
 
     return { success: true };
