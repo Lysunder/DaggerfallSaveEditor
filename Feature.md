@@ -62,6 +62,15 @@
 
 ## Changelog
 
+### Version 1.0.9
+
+🐛 **Bug Fixes:**
+- **Safer Saving**: If a backup can't be made, the save is no longer written, so the original is never overwritten without one. Files are now written to a temporary file and renamed into place, so a crash can't leave a half-written save. The editor also only writes to save files you opened in the current session.
+- **Value Limits**: Gold, bank balances, loans, inventory values and character fields are limited to the range Daggerfall Unity can read, skills are limited to 1-100, and item quantity can't go below 1.
+- **Repair All Items**: Items without a maximum condition are no longer left with an empty condition.
+- **Unsaved Changes**: Items that share the same ID are now compared correctly instead of being merged in the change list.
+- **Security**: The app window no longer exposes raw IPC access, and leftover debug messaging was removed.
+
 ### Version 1.0.8
 
 ✨ **New Features & Improvements:**
