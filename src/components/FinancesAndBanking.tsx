@@ -4,6 +4,7 @@ import {
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { clampInt } from '../utils/numbers';
 import { useSaveStore } from '../store/useSaveStore';
 import type { BankAccount } from '../store/useSaveStore';
 import { REGION_NAMES } from '../data/regions';
@@ -24,13 +25,13 @@ export const FinancesAndBanking = () => {
   const handleGoldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value, 10);
     if (!isNaN(val)) {
-      updatePlayerField('goldPieces', Math.max(0, val));
+      updatePlayerField('goldPieces', clampInt(val));
     }
   };
 
   // Both are C# ints in DFU. An emptied cell arrives as null, which DFU can't load, so keep the old value.
   const toInt = (value: unknown, fallback: number) =>
-    typeof value === 'number' && Number.isFinite(value) ? Math.trunc(value) : fallback;
+    typeof value === 'number' && Number.isFinite(value) ? clampInt(value) : fallback;
 
   const processRowUpdate = (newRow: BankAccount, oldRow: BankAccount) => {
     const accountGold = toInt(newRow.accountGold, oldRow.accountGold);

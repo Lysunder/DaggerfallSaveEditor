@@ -11,6 +11,7 @@ import {
   LinearProgress,
   Tooltip
 } from '@mui/material';
+import { clampInt } from '../utils/numbers';
 import { useSaveStore } from '../store/useSaveStore';
 
 export const StatsAndSkills: React.FC = () => {
@@ -45,7 +46,7 @@ export const StatsAndSkills: React.FC = () => {
   const handleSkillChange = (skillName: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value, 10);
     if (!isNaN(val)) {
-      updateSkill(skillName, val);
+      updateSkill(skillName, clampInt(val, 1, 100));
     }
   };
 

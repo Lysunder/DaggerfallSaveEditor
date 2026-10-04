@@ -443,7 +443,7 @@ export const useSaveStore = create<SaveStore>()(
         const items = state.saveData?.playerData?.playerEntity?.[target];
         if (items) {
           items.forEach((item: Item) => {
-            item.hits1 = item.hits2;
+            if (typeof item.hits2 === 'number') item.hits1 = item.hits2;
           });
         }
       }),

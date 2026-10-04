@@ -1,7 +1,7 @@
 {
   "name": "daggerfall-save-editor",
   "private": true,
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Desktop editor for The Elder Scrolls II: Daggerfall Unity save files",
   "repository": "Lysunder/DaggerfallSaveEditor",
   "main": "dist-electron/main.js",

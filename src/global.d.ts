@@ -1,10 +1,6 @@
 import type { AddLocationResult, LoadResult, SaveLocation, SaveSlot } from '../electron/saveTypes';
 
 export interface IpcRenderer {
-  on(channel: string, listener: (...args: any[]) => void): this;
-  off(channel: string, listener: (...args: any[]) => void): this;
-  send(channel: string, ...args: any[]): void;
-  invoke(channel: string, ...args: any[]): Promise<any>;
   openSaveData(): Promise<LoadResult>;
   /** Writes only the files passed; pass null for data or omit factionData when unchanged. */
   saveData(filePath: string, data: any | null, factionData?: any): Promise<{ success: boolean; error?: string }>;
