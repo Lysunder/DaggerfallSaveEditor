@@ -37,3 +37,33 @@ describe('markSaved', () => {
     expect(unsaved().map((change) => change.path.at(-1))).toEqual(['Luck']);
   });
 });
+
+describe('legal standing', () => {
+  it('clears crimes, negative reputations and punishments only', () => {
+    load('A/SaveData.txt');
+    store().clearLegalTrouble();
+    const entity = store().saveData!.playerData.playerEntity;
+    expect(entity.regionData).toEqual([
+      { LegalRep: 15, SeverePunishmentFlags: 0, Flags: [false], PrecipitationOverride: 0 },
+      { LegalRep: 0, SeverePunishmentFlags: 0, Flags: [false], PrecipitationOverride: 0 },
+    ]);
+    expect(entity.crimeCommitted).toBe('None');
+    expect(entity.haveShownSurrenderToGuardsDialogue).toBe(false);
+    // Region 0 was fine, so it isn't reported as changed.
+    expect(unsaved().map((change) => change.id).sort()).toEqual([
+      'save:playerData.playerEntity.crimeCommitted',
+      'save:playerData.playerEntity.haveShownSurrenderToGuardsDialogue',
+      'save:playerData.playerEntity.regionData[1].LegalRep',
+      'save:playerData.playerEntity.regionData[1].SeverePunishmentFlags',
+    ]);
+  });
+
+  it('clamps legal reputation to the range DFU allows', () => {
+    load('A/SaveData.txt');
+    store().updateRegionLegal(0, { LegalRep: 500 });
+    store().updateRegionLegal(1, { LegalRep: -250.7 });
+    const regions = store().saveData!.playerData.playerEntity.regionData!;
+    expect(regions[0].LegalRep).toBe(100);
+    expect(regions[1].LegalRep).toBe(-100);
+  });
+});

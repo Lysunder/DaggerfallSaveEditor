@@ -4,6 +4,7 @@ import { produce } from 'immer';
 import type { LoadedSave, SaveInfo } from '../../electron/saveTypes';
 import type { Change } from '../utils/saveDiff';
 import { revertChange as applyRevert, type RevertResult } from '../utils/revertChange';
+import { LEGAL_REP_MAX, LEGAL_REP_MIN, type RegionLegalRecord } from '../data/legal';
 
 interface Stats {
   Strength: number;
@@ -173,6 +174,11 @@ interface PlayerEntity {
   reputationUnderworld?: number;
   reputationSupernaturalBeings?: number;
   reputationGuildMembers?: number;
+  /** One record per region (62), indexed by region; see src/data/legal.ts. */
+  regionData?: RegionLegalRecord[] | null;
+  /** PlayerEntity.Crimes name of the crime the guards are after the player for, e.g. "None". */
+  crimeCommitted?: string | number;
+  haveShownSurrenderToGuardsDialogue?: boolean;
   startingLevelUpSkillSum?: number;
   currentLevelUpSkillSum?: number;
   [key: string]: any;
@@ -321,6 +327,10 @@ interface SaveStore {
   updatePlayerPositionCoords: (coords: Partial<{x: number, y: number, z: number}>) => void;
   updateBuildingDiscoveryData: (updates: Partial<any>) => void;
   updateGameTime: (deltaTick: number) => void;
+  updateRegionLegal: (regionIndex: number, updates: Pick<RegionLegalRecord, 'LegalRep' | 'SeverePunishmentFlags'>) => void;
+  setCrimeCommitted: (crime: string) => void;
+  /** Clears the current crime, negative legal reputations, banishments and death sentences in every region. */
+  clearLegalTrouble: () => void;
   reset: () => void;
 }
 
@@ -522,6 +532,43 @@ export const useSaveStore = create<SaveStore>()(
         if (state.saveData?.dateAndTime) {
           state.saveData.dateAndTime.gameTime += deltaTick;
         }
+      }),
+
+    updateRegionLegal: (regionIndex, updates) =>
+      set((state) => {
+        const region = state.saveData?.playerData?.playerEntity?.regionData?.[regionIndex];
+        if (!region) return;
+        if (updates.LegalRep !== undefined) {
+          region.LegalRep = Math.max(LEGAL_REP_MIN, Math.min(LEGAL_REP_MAX, Math.trunc(updates.LegalRep)));
+        }
+        if (updates.SeverePunishmentFlags !== undefined) region.SeverePunishmentFlags = updates.SeverePunishmentFlags;
+      }),
+
+    setCrimeCommitted: (crime) =>
+      set((state) => {
+        const playerEntity = state.saveData?.playerData?.playerEntity;
+        if (!playerEntity) return;
+        playerEntity.crimeCommitted = crime;
+        // DFU only resets this once no guards are around; with no crime there's nothing to surrender for.
+        if (crime === 'None' && playerEntity.haveShownSurrenderToGuardsDialogue) {
+          playerEntity.haveShownSurrenderToGuardsDialogue = false;
+        }
+      }),
+
+    clearLegalTrouble: () =>
+      set((state) => {
+        const playerEntity = state.saveData?.playerData?.playerEntity;
+        if (!playerEntity) return;
+        // Assigned only where something changes, so untouched regions don't show up as edits.
+        for (const region of playerEntity.regionData ?? []) {
+          if (!region) continue;
+          if ((region.LegalRep ?? 0) < 0) region.LegalRep = 0;
+          if (region.SeverePunishmentFlags) region.SeverePunishmentFlags = 0;
+        }
+        if (playerEntity.crimeCommitted !== undefined && playerEntity.crimeCommitted !== 'None' && playerEntity.crimeCommitted !== 0) {
+          playerEntity.crimeCommitted = 'None';
+        }
+        if (playerEntity.haveShownSurrenderToGuardsDialogue) playerEntity.haveShownSurrenderToGuardsDialogue = false;
       }),
 
     reset: () =>

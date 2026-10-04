@@ -45,6 +45,11 @@
 - **Guild Memberships**: Modify your rank within specific guilds you have joined (Mages Guild, Fighters Guild, Temples, etc.).
 - **Specific Faction Standing**: Directly edit reputation values for individual factions and localized groups.
 
+### ⚖️ Crime & Legal Standing
+- **Clear All Bounties**: One click resets every negative regional legal reputation to 0, lifts banishments and death sentences, and clears the crime the guards are after you for. Positive reputations are kept.
+- **Legal Reputation**: See and edit your legal reputation in each region (-100 to 100), with the standing the game shows ("A scoundrel", "Admired"…). Regions you have no record in are hidden unless you turn on "Show all regions".
+- **Wanted For**: See or change the crime you're currently wanted for.
+
 ### 🗺️ Location & World Data
 - **Positioning**: Edit player world coordinates (X, Y, Z) and orientation (Yaw, Pitch).
 - **Environment Status**: Toggle whether the player is currently inside a dungeon, building, tavern, or residence.
@@ -64,9 +69,13 @@
 
 ### Version 1.0.9
 
+✨ **New Features & Improvements:**
+- **Crime & Legal Standing**: Clear bounties and banishments in every region at once, or edit each region's legal reputation and the crime you're wanted for.
+
 🐛 **Bug Fixes:**
 - **Safer Saving**: If a backup can't be made, the save is no longer written, so the original is never overwritten without one. Files are now written to a temporary file and renamed into place, so a crash can't leave a half-written save. The editor also only writes to save files you opened in the current session.
 - **Value Limits**: Gold, bank balances, loans, inventory values and character fields are limited to the range Daggerfall Unity can read, skills are limited to 1-100, and item quantity can't go below 1.
+- **Region Names**: Most regions after Dwynnen had the wrong name (for example, Phrygias showed as "Daggerfall"), which also mislabelled bank accounts. Names now match Daggerfall Unity.
 - **Repair All Items**: Items without a maximum condition are no longer left with an empty condition.
 - **Unsaved Changes**: Items that share the same ID are now compared correctly instead of being merged in the change list.
 - **Security**: The app window no longer exposes raw IPC access, and leftover debug messaging was removed.

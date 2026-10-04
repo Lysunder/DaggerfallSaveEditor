@@ -10,6 +10,7 @@ A desktop application for editing save files from The Elder Scrolls II: Daggerfa
 - Modify inventory and wagon items, gold, and bank accounts
 - Toggle quest global variables and view main quest progress
 - Change faction reputations and guild ranks
+- Clear bounties and banishments, and edit each region's legal reputation
 - Review, revert or discard unsaved changes before saving; a backup is made before every write
 
 See [Feature.md](Feature.md) for the full feature list and changelog.

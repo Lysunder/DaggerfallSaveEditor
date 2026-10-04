@@ -1,6 +1,7 @@
 // Turns a Change into what the change list shows: a section, a label and formatted values.
 import { REGION_NAMES } from '../data/regions';
 import { guildName } from '../data/guilds';
+import { crimeLabel, crimeName, punishmentLabel } from '../data/legal';
 import { formatGameTime } from './daggerfallDate';
 import { propertyPath, type Change } from './saveDiff';
 
@@ -27,7 +28,7 @@ export interface ChangeLabel {
 
 export const SECTION_ORDER = [
   'Character', 'Career & Advantages', 'Stats & Skills', 'Inventory', 'Wagon', 'Finances',
-  'Factions & Reputation', 'Quest Flags', 'Location & Time', 'Other',
+  'Factions & Reputation', 'Crime & Law', 'Quest Flags', 'Location & Time', 'Other',
 ];
 
 const ITEM_FIELDS: Record<string, string> = {
@@ -118,6 +119,23 @@ export const labelChange = (change: Change, context: LabelContext = {}): ChangeL
   }
   if (under('playerData.playerPosition.')) {
     return { section: 'Location & Time', label: spacedName(field), ...values };
+  }
+  if (path.startsWith(`${entity}regionData`)) {
+    const index = change.path.find((segment) => typeof segment === 'number');
+    const regionName = typeof index === 'number' ? REGION_NAMES[index] ?? `region ${index}` : 'region';
+    if (field === 'SeverePunishmentFlags') {
+      const format = (value: unknown) => (typeof value === 'number' ? punishmentLabel(value) : formatValue(value));
+      return { section: 'Crime & Law', label: `${regionName} – punishment`, before: format(change.before), after: format(change.after) };
+    }
+    const what = field === 'LegalRep' ? 'legal reputation' : spacedName(field);
+    return { section: 'Crime & Law', label: `${regionName} – ${what}`, ...values };
+  }
+  if (path === `${entity}crimeCommitted`) {
+    const format = (value: unknown) => { const name = crimeName(value); return name ? crimeLabel(name) : formatValue(value); };
+    return { section: 'Crime & Law', label: 'Wanted for', before: format(change.before), after: format(change.after) };
+  }
+  if (path === `${entity}haveShownSurrenderToGuardsDialogue`) {
+    return { section: 'Crime & Law', label: 'Guards asked to surrender', ...values };
   }
   if (path === `${entity}equipTable`) {
     return { section: 'Inventory', label: `Equipment slot ${field.replace('#', '')}`, ...values };

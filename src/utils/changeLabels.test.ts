@@ -52,3 +52,14 @@ describe('labelChange', () => {
       .toEqual({ section: 'Other', label: 'currentUID', before: '100', after: '101' });
   });
 });
+
+describe('crime and law labels', () => {
+  it('names the region and formats crimes and punishments', () => {
+    expect(labelOf((d) => { d.playerData.playerEntity.regionData[1].LegalRep = 0; }))
+      .toEqual({ section: 'Crime & Law', label: 'Dragontail Mountains – legal reputation', before: '-40', after: '0' });
+    expect(labelOf((d) => { d.playerData.playerEntity.regionData[1].SeverePunishmentFlags = 0; }))
+      .toEqual({ section: 'Crime & Law', label: 'Dragontail Mountains – punishment', before: 'banished', after: 'none' });
+    expect(labelOf((d) => { d.playerData.playerEntity.crimeCommitted = 'None'; }))
+      .toEqual({ section: 'Crime & Law', label: 'Wanted for', before: 'Theft', after: 'None' });
+  });
+});

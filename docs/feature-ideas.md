@@ -4,7 +4,7 @@ Candidate features for the save editor, based on what Daggerfall Unity saves but
 
 ## Quick wins: data already loaded, just not editable
 
-- **Clear bounties and legal reputation.** `regionData[]` holds each region's legal standing, and `crimeCommitted` records the current crime. "I got caught stealing in Daggerfall" is a very common reason people reach for a save editor.
+- ✅ **Clear bounties and legal reputation.** *Done in 1.0.9.* `regionData[]` holds each region's legal standing, and `crimeCommitted` records the current crime. "I got caught stealing in Daggerfall" is a very common reason people reach for a save editor.
 - **Skill training progress.** `skillUses[]` counts progress toward each skill's next increase. The Stats & Skills page could show it as a bar per skill, matching the existing level progress bar.
 - **Equipment view.** `equipTable` maps equipment slots to item IDs. Showing what's worn where, with an unequip button, pairs naturally with the inventory manager.
 - **Biography modifiers and reflexes.** The six `biography*Mod` values (resist disease, magic, poison, avoid hit and so on) are set by the answers at character creation and are invisible in-game.
@@ -27,6 +27,6 @@ Candidate features for the save editor, based on what Daggerfall Unity saves but
 
 ## Suggested order
 
-1. **Clear bounties:** high demand, simple data.
+1. ~~**Clear bounties:** high demand, simple data.~~ Done.
 2. **Add item:** already planned.
 3. ~~**Save slot browser:** improves every session.~~ Done.
