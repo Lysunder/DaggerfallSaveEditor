@@ -1,14 +1,18 @@
 # Daggerfall Save Editor
 
-A desktop application for editing save files from The Elder Scrolls II: Daggerfall.
+A desktop application for editing save files from The Elder Scrolls II: Daggerfall Unity.
 
 ## Features
 
+- Browse your Daggerfall Unity saves (default, portable and custom locations) and open one with a click
 - Edit character stats, skill levels, and attributes
 - Reassign Primary, Major, and Minor class skills
-- Modify inventory items, gold, and spells
-- Tweak quest variables and progress
-- Change faction reputations
+- Modify inventory and wagon items, gold, and bank accounts
+- Toggle quest global variables and view main quest progress
+- Change faction reputations and guild ranks
+- Review, revert or discard unsaved changes before saving; a backup is made before every write
+
+See [Feature.md](Feature.md) for the full feature list and changelog.
 
 ## Installing on macOS
 
@@ -36,13 +40,14 @@ This project is built using:
 - **Zustand** for state management
 - **Immer** for immutable state updates
 - **Oxlint** for fast JavaScript/TypeScript linting
+- **Vitest** for unit tests
 
 ## Getting Started
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (latest LTS recommended)
-- npm or yarn
+- [Node.js](https://nodejs.org/) 24 (the version CI uses)
+- npm
 
 ### Installation
 
@@ -75,6 +80,12 @@ npm run build:dist
 ```
 
 ### Code Quality & Preview
+
+To run the unit tests:
+
+```bash
+npm test
+```
 
 To run the linter:
 

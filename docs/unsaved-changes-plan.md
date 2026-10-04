@@ -1,5 +1,7 @@
 # Plan: Unsaved-Changes Indicator and Change List
 
+> **Status: shipped in 1.0.8.** This is the original design. Differences in the shipped version: dirty state comes only from the diff (`diffAll`), not a reference-equality fast path, so don't compare `saveData` to the baseline by reference. The store keeps `repairs` (`{ id, path, value }`) rather than `repairedPaths`, and `markSaved(filePath, savedData, savedFactionData)` takes the snapshot that was written and ignores the call if another save was loaded meanwhile.
+
 Show when the loaded save has edits that haven't been written, list exactly what changed (old → new) before saving, and warn before those edits are lost by opening another save or closing the app.
 
 Why: the editor rewrites the whole `SaveData.txt` (and `FactionData.txt`) on every save. Today there's no way to see what an edit session changed, **Save** is enabled even with no changes, and opening another save or closing the window silently discards edits.

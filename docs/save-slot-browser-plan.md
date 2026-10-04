@@ -1,5 +1,7 @@
 # Plan: Save Slot Browser
 
+> **Status: shipped in 1.0.8.** This is the original design. Differences in the shipped version: the resolution helpers are `resolveSaveRoot`, `resolvePortable`, `resolveFolder` and `resolveLocations` (there is no `resolveRegular`), and a single `saves:scan` channel replaces `saves:locations` and `saves:list`. Since 1.0.9, `fs:saveData` also only writes save files opened in the current session. IPC channels are listed in `electron/preload.ts`; there is no `CLAUDE.md`. The sample save mentioned below lives in a gitignored `example/` folder and is not in the repo.
+
 Replace "find `SaveData.txt` in a file dialog" with a list of the player's Daggerfall Unity saves: character, save name, in-game date, real date saved and screenshot. Clicking one loads it. The file dialog stays as a fallback.
 
 Sources: Daggerfall Unity source at `E:\Projects\daggerfall-unity`:

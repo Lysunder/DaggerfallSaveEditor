@@ -1,5 +1,7 @@
 # Plan: Add an Item to the Inventory
 
+> **Status: not started.** None of the files named below exist yet, and `currentUID` is not in the save types.
+
 Let the user add a new item to the character's inventory or wagon from the Inventory Management section. The flow starts with picking an item type, then the specific item, then only the options that matter for that type, then a preview before it's added.
 
 Sources: Daggerfall Unity source at `E:\Projects\daggerfall-unity`:

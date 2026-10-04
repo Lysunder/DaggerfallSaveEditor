@@ -1,5 +1,7 @@
 # Plan: Main Quest Progress
 
+> **Status: shipped.** The sample save referred to below lives in a gitignored `example/` folder and is not in the repo, so the verification steps need your own save.
+
 Add a read-only panel to the character sheet that shows how far the player is through Daggerfall's main quest. It shows each branch, which quests are done, active, invited, available or locked, and which faction's ending the save is heading toward.
 
 Sources: Daggerfall Unity source at `E:\Projects\daggerfall-unity` (quest scripts in `Assets/StreamingAssets/Quests/`, serialization in `Assets/Scripts/Game/Serialization/SaveLoadManager.cs`, `Assets/Scripts/Game/Questing/` and `Assets/Scripts/Game/Player/PlayerNotebook.cs`), the [UESP Main Quest page](https://en.uesp.net/wiki/Daggerfall:Main_Quest), and the sample save in `example/`.

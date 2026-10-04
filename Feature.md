@@ -15,8 +15,8 @@
 - **Smaller Saves**: Only the files you changed are written and backed up.
 
 ### 👤 Character & Core Data
-- **Basic Information**: Edit character Name, Level, and Base Health.
-- **Vitals**: Modify current and maximum Health, Magicka, and Fatigue.
+- **Basic Information**: Edit character Name and Level, and see Race and Class.
+- **Vitals**: Modify current and maximum Health, current Magicka and Fatigue, and carried gold.
 - **Attributes (Stats)**: Adjust all core attributes (Strength, Intelligence, Willpower, Agility, Endurance, Personality, Speed, Luck).
 - **Skills**: Directly edit the mastery level of all Primary, Major, and Minor skills (Weapon skills, Magic schools, utility skills like Stealth and Climbing, and languages).
 - **Level Progress**: View exact skill increases required to reach the next character level, dynamically calculated from your current skills.
@@ -31,14 +31,14 @@
 ### 🎒 Inventory & Items
 - **Inventory Management**: View and edit items currently in your character's personal inventory.
 - **Wagon Management**: View and edit items stored in your wagon.
-- **Item Editing**: Modify item conditions (durability/hits) and stack counts.
+- **Item Editing**: Modify an item's condition and maximum condition, stack count, value and weight.
 - **Quick Repair**: "Repair All Items" functionality to instantly restore all items to maximum condition.
 - **Item Removal**: Delete specific items from your inventory or wagon.
 
 ### 💰 Finances & Banking
 - **Wallet**: Edit the amount of Gold Pieces currently held by the character.
 - **Bank Accounts**: Modify bank account balances and outstanding loan totals across all regions in the Illiac Bay.
-- **Property Ownership**: (Supported via the save data structure) Manage ship ownership and house deeds.
+- **Property Ownership**: View the house deeds stored in the save (read-only).
 
 ### 🤝 Factions & Reputation
 - **Global Reputations**: Adjust your standing with major societal groups (Commoners, Merchants, Nobility, Scholars, Underworld, Supernatural Beings).
@@ -53,10 +53,10 @@
 
 ### 📜 Quests & Global Variables
 - **Global Variables**: Toggle specific global game state variables on or off (used for tracking major world events or quest states).
-- **Quest Tracking**: View and potentially manipulate active quest states.
+- **Quest Tracking**: Search and filter the quest global variables and toggle them. Quest tasks and journals are not editable.
 - **Main Quest Progress**: See how far you are through the main quest: every branch and quest with its status (completed, in progress, invited, available or locked), the current quest's journal entry and time remaining, who holds the Totem, and which ending you reached. Read-only; uses `QuestData.txt` and `NotebookData.txt` from the save folder when present.
 
-> **Note**: All changes automatically generate a backup (`bak_SaveData.[n].txt`) before writing to prevent data loss.
+> **Note**: Every file that changes is backed up (`bak_SaveData.[n].txt`) before it is written. If the backup can't be made, nothing is written.
 
 ---
 

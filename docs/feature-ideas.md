@@ -23,7 +23,7 @@ Candidate features for the save editor, based on what Daggerfall Unity saves but
 - ✅ **Save slot browser.** *Done in 1.0.8* ([plan](save-slot-browser-plan.md)). DFU keeps each save in its own folder with a `SaveInfo.txt` holding the save name and date. Picking "Before the Mantella – 3E405" is nicer than finding `SAVE12/SaveData.txt` in a file dialog.
 - ✅ **Unsaved-changes indicator and change list.** *Done in 1.0.8* ([plan](unsaved-changes-plan.md)), with per-change revert. The whole file is rewritten on every save, so a list of what changed before writing, plus a warning when closing with unsaved edits, would build trust.
 - **Restore from backup.** Every save already makes a `bak_SaveData.N.txt`. A menu to list and restore them makes that safety net usable.
-- **Automated tests.** Vitest is set up (`npm test`, run in CI) and covers the save locations, date helpers, enum handling, and the unsaved-changes diff, labels and revert. Still untested: `mainQuestProgress.ts` and the planned item builder. Both are pure functions that are easy to test, and the DFU-built items in a real save make ready-made test data.
+- **Automated tests.** Vitest is set up (`npm test`, run in CI) and covers the save locations, date helpers, enum handling, guild data, numeric limits, the store, and the unsaved-changes diff, labels and revert. Still untested: `mainQuestProgress.ts` and the planned item builder. Both are pure functions that are easy to test, and the DFU-built items in a real save make ready-made test data.
 
 ## Suggested order
 
