@@ -9,6 +9,7 @@ import { QuestProgress } from '../components/QuestProgress';
 import { MainQuestProgress } from '../components/MainQuestProgress';
 import { FactionsAndReputation } from '../components/FactionsAndReputation';
 import { AllReputations } from '../components/AllReputations';
+import { LegalStanding } from '../components/LegalStanding';
 import { LocationAndWorldData } from '../components/LocationAndWorldData';
 import { SaveBrowser } from '../components/SaveBrowser';
 
@@ -63,6 +64,11 @@ export default function Home() {
         {/* All Reputations */}
         <Grid size={{ xs: 12 }}>
           <AllReputations />
+        </Grid>
+
+        {/* Crime & Legal Standing */}
+        <Grid size={{ xs: 12 }}>
+          <LegalStanding />
         </Grid>
 
         {/* Main Quest Progress */}

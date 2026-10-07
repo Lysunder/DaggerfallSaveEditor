@@ -15,8 +15,8 @@
 - **Smaller Saves**: Only the files you changed are written and backed up.
 
 ### 👤 Character & Core Data
-- **Basic Information**: Edit character Name, Level, and Base Health.
-- **Vitals**: Modify current and maximum Health, Magicka, and Fatigue.
+- **Basic Information**: Edit character Name and Level, and see Race and Class.
+- **Vitals**: Modify current and maximum Health, current Magicka and Fatigue, and carried gold.
 - **Attributes (Stats)**: Adjust all core attributes (Strength, Intelligence, Willpower, Agility, Endurance, Personality, Speed, Luck).
 - **Skills**: Directly edit the mastery level of all Primary, Major, and Minor skills (Weapon skills, Magic schools, utility skills like Stealth and Climbing, and languages).
 - **Level Progress**: View exact skill increases required to reach the next character level, dynamically calculated from your current skills.
@@ -31,19 +31,24 @@
 ### 🎒 Inventory & Items
 - **Inventory Management**: View and edit items currently in your character's personal inventory.
 - **Wagon Management**: View and edit items stored in your wagon.
-- **Item Editing**: Modify item conditions (durability/hits) and stack counts.
+- **Item Editing**: Modify an item's condition and maximum condition, stack count, value and weight.
 - **Quick Repair**: "Repair All Items" functionality to instantly restore all items to maximum condition.
 - **Item Removal**: Delete specific items from your inventory or wagon.
 
 ### 💰 Finances & Banking
 - **Wallet**: Edit the amount of Gold Pieces currently held by the character.
 - **Bank Accounts**: Modify bank account balances and outstanding loan totals across all regions in the Illiac Bay.
-- **Property Ownership**: (Supported via the save data structure) Manage ship ownership and house deeds.
+- **Property Ownership**: View the house deeds stored in the save (read-only).
 
 ### 🤝 Factions & Reputation
 - **Global Reputations**: Adjust your standing with major societal groups (Commoners, Merchants, Nobility, Scholars, Underworld, Supernatural Beings).
 - **Guild Memberships**: Modify your rank within specific guilds you have joined (Mages Guild, Fighters Guild, Temples, etc.).
 - **Specific Faction Standing**: Directly edit reputation values for individual factions and localized groups.
+
+### ⚖️ Crime & Legal Standing
+- **Clear All Bounties**: One click resets every negative regional legal reputation to 0, lifts banishments and death sentences, and clears the crime the guards are after you for. Positive reputations are kept.
+- **Legal Reputation**: See and edit your legal reputation in each region (-100 to 100), with the standing the game shows ("A scoundrel", "Admired"…). Regions you have no record in are hidden unless you turn on "Show all regions".
+- **Wanted For**: See or change the crime you're currently wanted for.
 
 ### 🗺️ Location & World Data
 - **Positioning**: Edit player world coordinates (X, Y, Z) and orientation (Yaw, Pitch).
@@ -53,14 +58,27 @@
 
 ### 📜 Quests & Global Variables
 - **Global Variables**: Toggle specific global game state variables on or off (used for tracking major world events or quest states).
-- **Quest Tracking**: View and potentially manipulate active quest states.
+- **Quest Tracking**: Search and filter the quest global variables and toggle them. Quest tasks and journals are not editable.
 - **Main Quest Progress**: See how far you are through the main quest: every branch and quest with its status (completed, in progress, invited, available or locked), the current quest's journal entry and time remaining, who holds the Totem, and which ending you reached. Read-only; uses `QuestData.txt` and `NotebookData.txt` from the save folder when present.
 
-> **Note**: All changes automatically generate a backup (`bak_SaveData.[n].txt`) before writing to prevent data loss.
+> **Note**: Every file that changes is backed up (`bak_SaveData.[n].txt`) before it is written. If the backup can't be made, nothing is written.
 
 ---
 
 ## Changelog
+
+### Version 1.0.9
+
+✨ **New Features & Improvements:**
+- **Crime & Legal Standing**: Clear bounties and banishments in every region at once, or edit each region's legal reputation and the crime you're wanted for.
+
+🐛 **Bug Fixes:**
+- **Safer Saving**: If a backup can't be made, the save is no longer written, so the original is never overwritten without one. Files are now written to a temporary file and renamed into place, so a crash can't leave a half-written save. The editor also only writes to save files you opened in the current session.
+- **Value Limits**: Gold, bank balances, loans, inventory values and character fields are limited to the range Daggerfall Unity can read, skills are limited to 1-100, and item quantity can't go below 1.
+- **Region Names**: Most regions after Dwynnen had the wrong name (for example, Phrygias showed as "Daggerfall"), which also mislabelled bank accounts. Names now match Daggerfall Unity.
+- **Repair All Items**: Items without a maximum condition are no longer left with an empty condition.
+- **Unsaved Changes**: Items that share the same ID are now compared correctly instead of being merged in the change list.
+- **Security**: The app window no longer exposes raw IPC access, and leftover debug messaging was removed.
 
 ### Version 1.0.8
 

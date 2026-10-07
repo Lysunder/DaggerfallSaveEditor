@@ -24,6 +24,13 @@ export const makeSave = () => ({
       equipTable: [0, 2, 0, 1],
       globalVars: [{ index: 0, name: 'LiftedCurse', value: false }],
       reputationCommoners: 10,
+      // Regions 0 and 1 of 62; 1 has a bad record and a banishment.
+      regionData: [
+        { LegalRep: 15, SeverePunishmentFlags: 0, Flags: [false], PrecipitationOverride: 0 },
+        { LegalRep: -40, SeverePunishmentFlags: 1, Flags: [false], PrecipitationOverride: 0 },
+      ],
+      crimeCommitted: 'Theft',
+      haveShownSurrenderToGuardsDialogue: true,
     },
   },
 });
