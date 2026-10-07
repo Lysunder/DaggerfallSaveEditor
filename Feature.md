@@ -72,7 +72,7 @@
 
 ## Changelog
 
-### Unreleased
+### Version 1.0.10
 
 ✨ **New Features & Improvements:**
 - **Error Reports**: Errors no longer leave a blank white window. The failing section (or the whole window) shows what went wrong with a **Copy error report** button, so you can send the details with a bug report. Window crashes and freezes show a dialog with the same option.
