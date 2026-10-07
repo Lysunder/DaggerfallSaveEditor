@@ -78,6 +78,7 @@
 - **Error Reports**: Errors no longer leave a blank white window. The failing section (or the whole window) shows what went wrong with a **Copy error report** button, so you can send the details with a bug report. Window crashes and freezes show a dialog with the same option.
 
 🐛 **Bug Fixes:**
+- **Blank Window for Characters Without a Guild**: A character who hadn't joined any guild crashed the Factions & Reputation section, and with it the whole window, because Daggerfall Unity saves an empty membership list as `{}` rather than `[]`. The change list had the same problem.
 - **Inventory**: An item without a name made the Inventory section crash.
 
 ### Version 1.0.9

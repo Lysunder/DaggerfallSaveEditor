@@ -67,3 +67,15 @@ describe('legal standing', () => {
     expect(regions[1].LegalRep).toBe(-100);
   });
 });
+
+describe('guild memberships', () => {
+  it('ignores a rank change when the save has no memberships ({})', () => {
+    store().loadSaveData({
+      filePath: 'A/SaveData.txt',
+      data: { ...makeSave(), playerData: { ...makeSave().playerData, guildMemberships: {} } },
+      factionData: null, questData: null, notebookData: null, saveInfo: null,
+    });
+    expect(() => store().updateGuildRank(10, 3)).not.toThrow();
+    expect(unsaved()).toEqual([]);
+  });
+});

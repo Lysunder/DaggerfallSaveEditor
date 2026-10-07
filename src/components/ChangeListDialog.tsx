@@ -4,6 +4,7 @@ import {
   ListSubheader, Tooltip, Typography,
 } from '@mui/material';
 import UndoIcon from '@mui/icons-material/Undo';
+import { membershipList } from '../data/guilds';
 import { useSaveStore } from '../store/useSaveStore';
 import { useNotification } from '../context/NotificationContext';
 import { useConfirm } from '../context/confirm';
@@ -50,7 +51,7 @@ export const ChangeListDialog = ({ open, onClose }: { open: boolean; onClose: ()
   }, [factionData]);
 
   const guildVariants = useMemo(
-    () => new Map((memberships ?? []).map((membership) => [membership.Key, membership.Value?.variant ?? 0])),
+    () => new Map(membershipList(memberships).map((membership) => [membership.Key, membership.Value?.variant ?? 0])),
     [memberships],
   );
 
