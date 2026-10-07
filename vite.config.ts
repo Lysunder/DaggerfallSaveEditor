@@ -8,6 +8,11 @@ const { version } = JSON.parse(readFileSync(new URL('./package.json', import.met
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Not minified, so the stack traces in users' error reports name real functions and components.
+  // It's a desktop app loaded from disk, so the larger bundle doesn't matter.
+  build: {
+    minify: false,
+  },
   define: {
     __APP_VERSION__: JSON.stringify(version),
   },

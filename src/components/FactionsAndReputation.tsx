@@ -3,7 +3,7 @@ import {
   Box, Typography, Paper, Grid, Slider, List, ListItem, ListItemText, Select, MenuItem, FormControl, InputLabel, Alert, Divider 
 } from '@mui/material';
 import { useSaveStore } from '../store/useSaveStore';
-import { guildName, resolveFactionId } from '../data/guilds';
+import { guildName, membershipList, resolveFactionId } from '../data/guilds';
 
 const SOCIAL_GROUPS = [
   { key: 'reputationCommoners', label: 'Commoners' },
@@ -39,8 +39,8 @@ export const FactionsAndReputation = () => {
   }
 
   const { playerEntity } = saveData.playerData;
-  const memberships = saveData.playerData.guildMemberships || [];
-  const vampireMemberships = saveData.playerData.vampireMemberships || [];
+  const memberships = membershipList(saveData.playerData.guildMemberships);
+  const vampireMemberships = membershipList(saveData.playerData.vampireMemberships);
 
   const handleReputationChange = (key: string, value: number | number[]) => {
     updatePlayerField(key as any, value as number);

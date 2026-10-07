@@ -46,3 +46,21 @@ export const guildName = (guildGroup: number, variant: number, factionNames?: Ma
   const fromFile = factionNames instanceof Map ? factionNames.get(factionId) : factionNames?.[factionId];
   return fromFile || FACTION_NAMES[factionId] || `Unknown Faction (Group: ${guildGroup}, ID: ${factionId})`;
 };
+
+export interface Membership {
+  Key: number;
+  Value: { rank?: number; variant?: number; [key: string]: any };
+}
+
+/**
+ * Memberships as a list. DFU's guildMemberships and vampireMemberships are Dictionary<int, …>.
+ * FullSerializer writes them as an array of { Key, Value }, but an empty dictionary as {} (no keys,
+ * so it counts as a string-keyed object). Accepts both, and an object map with entries, just in case.
+ */
+export const membershipList = (value: unknown): Membership[] => {
+  if (Array.isArray(value)) return value.filter((entry) => entry && typeof entry === 'object');
+  if (value && typeof value === 'object') {
+    return Object.entries(value as Record<string, any>).map(([key, entry]) => ({ Key: Number(key), Value: entry ?? {} }));
+  }
+  return [];
+};

@@ -13,4 +13,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   removeSaveLocation: (id: string) => ipcRenderer.invoke('saves:removeLocation', id),
   getSaveScreenshot: (folder: string) => ipcRenderer.invoke('saves:screenshot', folder),
   loadSaveSlot: (folder: string) => ipcRenderer.invoke('saves:load', folder),
+
+  // Error reports
+  copyText: (text: string) => ipcRenderer.invoke('app:copyText', text),
 });

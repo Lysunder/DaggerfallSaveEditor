@@ -4,6 +4,8 @@ import MainLayout from './layout/MainLayout';
 import Home from './pages/Home';
 import { NotificationProvider } from './context/NotificationContext';
 import { ConfirmProvider } from './context/ConfirmProvider';
+import { ErrorBoundary } from './components/errors/ErrorBoundary';
+import { GlobalErrorHandler } from './components/errors/GlobalErrorHandler';
 
 const darkTheme = createTheme({
   palette: {
@@ -20,6 +22,9 @@ const darkTheme = createTheme({
 function App() {
   return (
     <ThemeProvider theme={darkTheme}>
+      {/* Last line of defence: without it, an error anywhere blanks the whole window. */}
+      <ErrorBoundary name="Editor" variant="app">
+      <GlobalErrorHandler />
       <NotificationProvider>
         <ConfirmProvider>
           <HashRouter>
@@ -31,6 +36,7 @@ function App() {
           </HashRouter>
         </ConfirmProvider>
       </NotificationProvider>
+      </ErrorBoundary>
     </ThemeProvider>
   );
 }

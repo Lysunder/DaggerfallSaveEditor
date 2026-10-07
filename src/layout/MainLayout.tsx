@@ -12,6 +12,7 @@ import { useSaveWriter } from '../hooks/useSaveWriter';
 import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
 import { SaveBrowser } from '../components/SaveBrowser';
 import { ChangeListDialog } from '../components/ChangeListDialog';
+import { ErrorBoundary } from '../components/errors/ErrorBoundary';
 
 const APP_TITLE = 'Daggerfall Unity Save Editor';
 
@@ -96,19 +97,26 @@ export default function MainLayout() {
       </AppBar>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Toolbar />
-        <Outlet />
+        {/* Keeps the toolbar, and with it Save, working if the page fails. */}
+        <ErrorBoundary name="Page" resetKey={currentFilePath}>
+          <Outlet />
+        </ErrorBoundary>
       </Box>
 
       <Dialog open={browserOpen} onClose={() => setBrowserOpen(false)} fullWidth maxWidth="md">
         <DialogContent>
-          <SaveBrowser onLoaded={() => setBrowserOpen(false)} />
+          <ErrorBoundary name="Save browser">
+            <SaveBrowser onLoaded={() => setBrowserOpen(false)} />
+          </ErrorBoundary>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setBrowserOpen(false)}>Close</Button>
         </DialogActions>
       </Dialog>
 
-      <ChangeListDialog open={changesOpen} onClose={() => setChangesOpen(false)} />
+      <ErrorBoundary name="Change list" resetKey={changesOpen}>
+        <ChangeListDialog open={changesOpen} onClose={() => setChangesOpen(false)} />
+      </ErrorBoundary>
     </Box>
   );
 }

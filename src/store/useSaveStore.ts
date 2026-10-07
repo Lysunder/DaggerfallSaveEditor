@@ -214,8 +214,9 @@ interface SaveGameData {
       };
       [key: string]: any;
     };
-    guildMemberships?: { Key: number; Value: { rank: number; [key: string]: any } }[];
-    vampireMemberships?: any[];
+    /** An array of { Key, Value }, or {} when empty (see membershipList in src/data/guilds.ts). */
+    guildMemberships?: { Key: number; Value: { rank: number; [key: string]: any } }[] | Record<string, never>;
+    vampireMemberships?: any[] | Record<string, never>;
     [key: string]: any;
   };
   bankAccounts: BankAccount[];
@@ -483,7 +484,7 @@ export const useSaveStore = create<SaveStore>()(
     updateGuildRank: (factionId, newRank) =>
       set((state) => {
         const memberships = state.saveData?.playerData?.guildMemberships;
-        if (memberships) {
+        if (Array.isArray(memberships)) {
           const membership = memberships.find((m: any) => m.Key === factionId);
           if (membership && membership.Value) {
             membership.Value.rank = newRank;

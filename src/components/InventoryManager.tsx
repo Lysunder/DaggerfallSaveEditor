@@ -44,7 +44,7 @@ export const InventoryManager: React.FC = () => {
   // Filter items
   const filteredItems = useMemo(() => {
     return (currentItems ?? []).filter((item) => {
-      const matchName = item.shortName.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchName = (item.shortName ?? '').toLowerCase().includes(searchTerm.toLowerCase());
       const matchCategory = categoryFilter === 'All' || item.itemGroup === categoryFilter;
       return matchName && matchCategory;
     });
