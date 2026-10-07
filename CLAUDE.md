@@ -18,7 +18,7 @@ The DFU source is the reference for save formats; the plans in `docs/` cite the 
 
 Verify changes with `npm test`, `npm run build` and `npm run lint`, and by loading a save (e.g. a local `example/SaveData.txt`) in the running app.
 
-CI (`.github/workflows/build.yml`) runs the tests, then builds on Windows/Linux/macOS for pushes to `master` and `features`, `v*` tags, and manual runs (`workflow_dispatch`); build outputs are uploaded as run artifacts. Tag builds also upload to a draft GitHub Release. Installer names come from the version in `package.json`, not the tag, so tag the commit that has the matching version. User-facing changes are recorded in `Feature.md` (feature list + changelog). macOS builds are ad-hoc signed (`identity: '-'`, hardened runtime off) and not notarized; electron-builder packages only `dist/` and `dist-electron/`, so renderer libraries are `devDependencies`.
+CI (`.github/workflows/build.yml`) runs the tests, then builds on Windows/Linux/macOS for pushes to `master` and `features`, any pushed tag (release tags are plain versions like `1.0.9`; `v*` also works), and manual runs (`workflow_dispatch`); build outputs are uploaded as run artifacts. Tag builds also upload to a draft GitHub Release. Installer names come from the version in `package.json`, not the tag, so tag the commit that has the matching version. User-facing changes are recorded in `Feature.md` (feature list + changelog). macOS builds are ad-hoc signed (`identity: '-'`, hardened runtime off) and not notarized; electron-builder packages only `dist/` and `dist-electron/`, so renderer libraries are `devDependencies`.
 
 ## Architecture
 

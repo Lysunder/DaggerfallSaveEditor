@@ -8,6 +8,7 @@ on:
       - features
     tags:
       - 'v*'
+      - '*'
 
 permissions:
   contents: write
