@@ -12,6 +12,9 @@ export interface IpcRenderer {
   removeSaveLocation(id: string): Promise<void>;
   getSaveScreenshot(folder: string): Promise<string | null>;
   loadSaveSlot(folder: string): Promise<LoadResult>;
+
+  /** Puts text on the system clipboard (used to copy error reports). */
+  copyText(text: string): Promise<void>;
 }
 
 declare global {

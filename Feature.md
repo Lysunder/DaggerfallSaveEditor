@@ -7,6 +7,11 @@
 - **Save Locations**: Finds the default Daggerfall Unity save folder automatically and follows a custom save path set in DFU's `settings.ini`. Portable installs are supported: point the editor at the install folder once, and it resolves the saves the same way DFU does. You can also add any folder of saves, and show or hide saves by location.
 - **Open File**: Opening a `SaveData.txt` directly is still available.
 
+### 🧯 Error Reports
+- **No More Blank Window**: If part of the editor fails, only that section shows an error; the rest keeps working, including Save. If the whole editor fails, a full-window error screen replaces the blank window.
+- **Copyable Report**: Every error screen has a **Copy error report** button. The report says what failed and where, with the app version and system, but contains no save data, and your user name is removed from file paths.
+- **Window Crashes**: If the editor window itself crashes or stops responding, a dialog explains what happened and offers to copy the report, reload or quit.
+
 ### 📝 Unsaved Changes
 - **Change Indicator**: The toolbar shows how many unsaved changes you have, and the window title gets a `*`. **Save** is only enabled when there's something to save.
 - **Change List**: Click the indicator to see every change grouped by section, in plain language with old and new values (e.g. "Strength: 55 → 70", "Removed: Silver Longsword").
@@ -66,6 +71,14 @@
 ---
 
 ## Changelog
+
+### Unreleased
+
+✨ **New Features & Improvements:**
+- **Error Reports**: Errors no longer leave a blank white window. The failing section (or the whole window) shows what went wrong with a **Copy error report** button, so you can send the details with a bug report. Window crashes and freezes show a dialog with the same option.
+
+🐛 **Bug Fixes:**
+- **Inventory**: An item without a name made the Inventory section crash.
 
 ### Version 1.0.9
 

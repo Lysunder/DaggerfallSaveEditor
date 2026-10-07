@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, clipboard } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -70,6 +70,32 @@ function createWindow() {
     }
   });
 
+  // A crashed or killed renderer leaves a blank window with no way to report what happened.
+  win.webContents.on('render-process-gone', (_event, details) => {
+    void reportRendererGone(details);
+  });
+
+  // A hang (e.g. an endless loop) also looks like a frozen window; let the user get out of it.
+  win.on('unresponsive', async () => {
+    if (!win) return;
+    const { response } = await dialog.showMessageBox(win, {
+      type: 'warning',
+      title: 'The editor is not responding',
+      message: 'The editor window has stopped responding.',
+      detail: 'You can wait for it, or reload it (unsaved changes will be lost). If this keeps happening, please report what you were doing when it froze.',
+      buttons: ['Wait', 'Reload'],
+      defaultId: 0,
+      cancelId: 0,
+      noLink: true,
+    });
+    if (response === 1) {
+      // Electron's documented way to recover a hung renderer: kill it, then reload.
+      killingHungRenderer = true;
+      win.webContents.forcefullyCrashRenderer();
+      win.webContents.reload();
+    }
+  });
+
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);
     // Open devTools automatically in development
@@ -83,6 +109,47 @@ function createWindow() {
 // Save files the user opened this session. Only these may be written back, so the renderer can't
 // ask the main process to overwrite arbitrary paths.
 const writableSaveFiles = new Set<string>();
+
+// Set while the user reloads a hung window, so that kill isn't reported as a crash.
+let killingHungRenderer = false;
+
+async function reportRendererGone(details: Electron.RenderProcessGoneDetails) {
+  if (killingHungRenderer) {
+    killingHungRenderer = false;
+    return;
+  }
+  if (!win || details.reason === 'clean-exit') return;
+  const report = [
+    'Daggerfall Unity Save Editor – error report',
+    `Version: ${app.getVersion()}`,
+    `Time: ${new Date().toISOString()}`,
+    'Where: Window process',
+    `System: ${process.platform} ${process.arch}, Electron ${process.versions.electron}, Chrome ${process.versions.chrome}`,
+    '',
+    `Error: the window's process stopped (${details.reason}, exit code ${details.exitCode})`,
+  ].join('\n');
+
+  // Loops so "Copy" can be pressed and the dialog stays until the user picks Reload or Quit.
+  for (;;) {
+    const { response } = await dialog.showMessageBox(win, {
+      type: 'error',
+      title: 'The editor stopped working',
+      message: 'The editor window crashed, and any unsaved changes were lost.',
+      detail: `${report}\n\nCopy this report and send it with your bug report. It doesn't contain your save data.`,
+      buttons: ['Copy error report', 'Reload', 'Quit'],
+      defaultId: 0,
+      cancelId: 1,
+      noLink: true,
+    });
+    if (response === 0) {
+      clipboard.writeText(report);
+      continue;
+    }
+    if (response === 1) win.webContents.reload();
+    else app.quit();
+    return;
+  }
+}
 
 // Loads SaveData.txt plus its optional sibling files. QuestData, NotebookData and SaveInfo are read-only.
 async function loadSaveFolder(filePath: string): Promise<LoadResult> {
@@ -289,6 +356,11 @@ ipcMain.handle('fs:saveData', async (_event, filePath: string, data: any | null,
   } catch (error: any) {
     return { success: false, error: error.message };
   }
+});
+
+ipcMain.handle('app:copyText', (_event, text: unknown) => {
+  if (typeof text !== 'string') throw new Error('Only text can be copied.');
+  clipboard.writeText(text.slice(0, 100_000));
 });
 
 // App events

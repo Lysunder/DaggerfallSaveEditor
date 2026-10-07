@@ -12,14 +12,39 @@ import { AllReputations } from '../components/AllReputations';
 import { LegalStanding } from '../components/LegalStanding';
 import { LocationAndWorldData } from '../components/LocationAndWorldData';
 import { SaveBrowser } from '../components/SaveBrowser';
+import { ErrorBoundary } from '../components/errors/ErrorBoundary';
+
+// Stats & Skills lays out its own grid items, so it gets a nested container.
+const StatsAndSkillsSection = () => (
+  <Grid container spacing={4}>
+    <StatsAndSkills />
+  </Grid>
+);
+
+const SECTIONS = [
+  { name: 'Character Basics', Component: CharacterBasics },
+  { name: 'Career & Advantages', Component: CareerAndAdvantages },
+  { name: 'Stats & Skills', Component: StatsAndSkillsSection },
+  { name: 'Inventory', Component: InventoryManager },
+  { name: 'Finances & Banking', Component: FinancesAndBanking },
+  { name: 'Factions & Reputation', Component: FactionsAndReputation },
+  { name: 'All Faction Reputations', Component: AllReputations },
+  { name: 'Crime & Legal Standing', Component: LegalStanding },
+  { name: 'Main Quest Progress', Component: MainQuestProgress },
+  { name: 'Quest Flags', Component: QuestProgress },
+  { name: 'Location & World Data', Component: LocationAndWorldData },
+];
 
 export default function Home() {
   const saveData = useSaveStore((state) => state.saveData);
+  const currentFilePath = useSaveStore((state) => state.currentFilePath);
 
   if (!saveData || !saveData.playerData?.playerEntity) {
     return (
       <Box sx={{ maxWidth: 1000, mx: 'auto' }}>
-        <SaveBrowser />
+        <ErrorBoundary name="Save browser">
+          <SaveBrowser />
+        </ErrorBoundary>
       </Box>
     );
   }
@@ -33,58 +58,14 @@ export default function Home() {
       </Typography>
 
       <Grid container spacing={4} sx={{ mt: 2 }}>
-        {/* Basic Info */}
-        <Grid size={{ xs: 12 }}>
-          <CharacterBasics />
-        </Grid>
-        
-        {/* Career & Advantages */}
-        <Grid size={{ xs: 12 }}>
-          <CareerAndAdvantages />
-        </Grid>
-
-        {/* Attributes & Skills */}
-        <StatsAndSkills />
-        
-        {/* Inventory Management */}
-        <Grid size={{ xs: 12 }}>
-          <InventoryManager />
-        </Grid>
-
-        {/* Finances & Banking */}
-        <Grid size={{ xs: 12 }}>
-          <FinancesAndBanking />
-        </Grid>
-
-        {/* Factions & Reputation */}
-        <Grid size={{ xs: 12 }}>
-          <FactionsAndReputation />
-        </Grid>
-
-        {/* All Reputations */}
-        <Grid size={{ xs: 12 }}>
-          <AllReputations />
-        </Grid>
-
-        {/* Crime & Legal Standing */}
-        <Grid size={{ xs: 12 }}>
-          <LegalStanding />
-        </Grid>
-
-        {/* Main Quest Progress */}
-        <Grid size={{ xs: 12 }}>
-          <MainQuestProgress />
-        </Grid>
-
-        {/* Quest Progress & Global Flags */}
-        <Grid size={{ xs: 12 }}>
-          <QuestProgress />
-        </Grid>
-
-        {/* Location & World Data */}
-        <Grid size={{ xs: 12 }}>
-          <LocationAndWorldData />
-        </Grid>
+        {SECTIONS.map(({ name, Component }) => (
+          <Grid key={name} size={{ xs: 12 }}>
+            {/* One failing section shows an error report instead of blanking the whole sheet. */}
+            <ErrorBoundary name={name} resetKey={currentFilePath}>
+              <Component />
+            </ErrorBoundary>
+          </Grid>
+        ))}
       </Grid>
     </Box>
   );
