@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useSaveStore } from './useSaveStore';
 import { diffAll } from '../utils/saveDiff';
-import { makeSave } from '../utils/testFixtures';
+import { makeEffectBundles, makeSave } from '../utils/testFixtures';
+import { labelChange } from '../utils/changeLabels';
 
 const store = () => useSaveStore.getState();
 const load = (filePath: string) =>
@@ -77,5 +78,59 @@ describe('guild memberships', () => {
     });
     expect(() => store().updateGuildRank(10, 3)).not.toThrow();
     expect(unsaved()).toEqual([]);
+  });
+});
+
+describe('status effects', () => {
+  const loadWithEffects = () => {
+    const data = makeSave();
+    Object.assign(data.playerData.playerEntity, {
+      instancedEffectBundles: makeEffectBundles(),
+      maxHealth: 80, currentHealth: 20, currentMagicka: 0, currentFatigue: 100,
+      careerTemplate: { ...data.playerData.playerEntity.careerTemplate, SpellPointMultiplierValue: 2 },
+      stats: { Strength: 50, Intelligence: 40, Endurance: 40 },
+    });
+    store().loadSaveData({ filePath: 'A/SaveData.txt', data, factionData: null, questData: null, notebookData: null, saveInfo: null });
+  };
+  const keys = () => store().saveData!.playerData.playerEntity.instancedEffectBundles!.map((b) => b.liveEffects?.[0]?.key);
+
+  it('cures one affliction and leaves everything else untouched', () => {
+    loadWithEffects();
+    const before = store().saveData!.playerData.playerEntity.instancedEffectBundles!;
+    expect(store().cureAfflictions([2])).toEqual({ cured: ['Nux Vomica'], skipped: [] });
+    const after = store().saveData!.playerData.playerEntity.instancedEffectBundles!;
+    expect(after).toHaveLength(before.length - 1);
+    expect(after[2]).toBe(before[3]); // remaining bundles are the same objects
+  });
+
+  it('cures all of a kind but skips item spells and curses', () => {
+    loadWithEffects();
+    expect(store().cureAllOfKind('Disease').cured).toEqual(["Witches' Pox", 'Vampirism (infection)']);
+    const spells = store().cureAllOfKind('HarmfulSpell');
+    expect(spells.cured).toEqual(['Drain Strength', 'Paralysis']);
+    expect(store().cureAfflictions([keys().indexOf('Vampirism-Curse')]).skipped).toHaveLength(1);
+    expect(keys()).toEqual(['Poison-Nux_Vomica', 'Silence', 'Vampirism-Curse', 'Shield', 'Fortify-Strength']);
+  });
+
+  it('labels a cure in the change list and reverts it', () => {
+    loadWithEffects();
+    store().cureAfflictions([0, 4]);
+    const changes = unsaved();
+    expect(changes).toHaveLength(1);
+    expect(labelChange(changes[0]).label).toBe("Cured: Witches' Pox, Paralysis");
+    store().revertChange(changes[0]);
+    expect(unsaved()).toEqual([]);
+  });
+
+  it('restores each vital to its maximum, separately', () => {
+    loadWithEffects();
+    store().restoreVital('health');
+    let entity = store().saveData!.playerData.playerEntity;
+    expect([entity.currentHealth, entity.currentMagicka, entity.currentFatigue]).toEqual([80, 0, 100]);
+    store().restoreVital('magicka');
+    store().restoreVital('fatigue');
+    entity = store().saveData!.playerData.playerEntity;
+    // Live INT 40 → 80 magicka. Live STR 50−6−10+5 = 39, END 40−3−1 = 36 → (39+36)×64.
+    expect([entity.currentMagicka, entity.currentFatigue]).toEqual([80, 75 * 64]);
   });
 });

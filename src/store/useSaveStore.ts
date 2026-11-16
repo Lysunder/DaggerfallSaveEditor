@@ -5,6 +5,10 @@ import type { LoadedSave, SaveInfo } from '../../electron/saveTypes';
 import type { Change } from '../utils/saveDiff';
 import { revertChange as applyRevert, type RevertResult } from '../utils/revertChange';
 import { LEGAL_REP_MAX, LEGAL_REP_MIN, type RegionLegalRecord } from '../data/legal';
+import {
+  findAfflictions, instancedBundles, maxVitals, referencedIdsWithin, type AfflictionKind, type EffectBundle,
+} from '../data/statusEffects';
+import { clampInt } from '../utils/numbers';
 
 interface Stats {
   Strength: number;
@@ -179,6 +183,8 @@ interface PlayerEntity {
   /** PlayerEntity.Crimes name of the crime the guards are after the player for, e.g. "None". */
   crimeCommitted?: string | number;
   haveShownSurrenderToGuardsDialogue?: boolean;
+  /** Active effects (spells, diseases, poisons…); see src/data/statusEffects.ts. */
+  instancedEffectBundles?: EffectBundle[] | null;
   startingLevelUpSkillSum?: number;
   currentLevelUpSkillSum?: number;
   [key: string]: any;
@@ -332,7 +338,19 @@ interface SaveStore {
   setCrimeCommitted: (crime: string) => void;
   /** Clears the current crime, negative legal reputations, banishments and death sentences in every region. */
   clearLegalTrouble: () => void;
+  /** Removes the effect bundles at these indices (diseases, poisons, harmful spells), as DFU's cures do. */
+  cureAfflictions: (indices: number[]) => CureResult;
+  /** Cures every curable affliction of one kind. */
+  cureAllOfKind: (kind: Exclude<AfflictionKind, 'Curse'>) => CureResult;
+  /** Sets current health, magicka or fatigue to its maximum. */
+  restoreVital: (vital: 'health' | 'magicka' | 'fatigue') => void;
   reset: () => void;
+}
+
+export interface CureResult {
+  cured: string[];
+  /** Afflictions left in place, with the reason. */
+  skipped: { name: string; reason: string }[];
 }
 
 export interface EnumRepairEntry {
@@ -554,6 +572,54 @@ export const useSaveStore = create<SaveStore>()(
         if (crime === 'None' && playerEntity.haveShownSurrenderToGuardsDialogue) {
           playerEntity.haveShownSurrenderToGuardsDialogue = false;
         }
+      }),
+
+    cureAfflictions: (indices) => {
+      // Decided outside the draft, on the plain save, so the reference check reads real data.
+      const { saveData } = get();
+      const playerEntity = saveData?.playerData?.playerEntity;
+      const result: CureResult = { cured: [], skipped: [] };
+      if (!saveData || !playerEntity) return result;
+      const bundles = instancedBundles(playerEntity);
+      const byIndex = new Map(findAfflictions(playerEntity).map((affliction) => [affliction.index, affliction]));
+      const remove: number[] = [];
+      for (const index of new Set(indices)) {
+        const affliction = byIndex.get(index);
+        if (!affliction) continue;
+        if (affliction.kind === 'Curse' || affliction.notCurable) {
+          result.skipped.push({ name: affliction.name, reason: affliction.notCurable ?? "The editor can't cure this." });
+        } else if (referencedIdsWithin(saveData, bundles[index]).length > 0) {
+          result.skipped.push({ name: affliction.name, reason: 'Other data in the save refers to it, so removing it could break the save.' });
+        } else {
+          remove.push(index);
+          result.cured.push(affliction.name);
+        }
+      }
+      if (remove.length === 0) return result;
+      set((state) => {
+        const list = state.saveData?.playerData?.playerEntity?.instancedEffectBundles;
+        if (!Array.isArray(list)) return;
+        for (const index of remove.sort((a, b) => b - a)) list.splice(index, 1);
+      });
+      return result;
+    },
+
+    cureAllOfKind: (kind) => {
+      const playerEntity = get().saveData?.playerData?.playerEntity;
+      const indices = findAfflictions(playerEntity).filter((affliction) => affliction.kind === kind).map((affliction) => affliction.index);
+      return get().cureAfflictions(indices);
+    },
+
+    restoreVital: (vital) =>
+      set((state) => {
+        const playerEntity = state.saveData?.playerData?.playerEntity;
+        if (!playerEntity) return;
+        const max = clampInt(maxVitals(playerEntity)[vital]);
+        const field = vital === 'health' ? 'currentHealth' : vital === 'magicka' ? 'currentMagicka' : 'currentFatigue';
+        // Never lowers a value that's above the computed maximum (e.g. from an effect the editor doesn't model).
+        const current = playerEntity[field];
+        if (typeof current === 'number' && current >= max) return;
+        playerEntity[field] = max;
       }),
 
     clearLegalTrouble: () =>

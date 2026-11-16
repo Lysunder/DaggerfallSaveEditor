@@ -28,6 +28,8 @@ interface RecordGroup {
 const describeValues = (row: Row) => {
   if (row.change.kind === 'removed') return 'Deleted';
   if (row.change.kind === 'added') return 'New';
+  // Labels that say it all (e.g. "Cured: …") have no values to show.
+  if (!row.label.before && !row.label.after) return '';
   return `${row.label.before} → ${row.label.after}`;
 };
 

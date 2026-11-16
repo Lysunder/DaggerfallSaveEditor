@@ -1,5 +1,7 @@
 # Plan: Clear Poisons, Diseases and Harmful Spells
 
+> **Status: built on the `features` branch, not yet released.** Differences from the plan: only `fromEquippedItemID` marks a spell as coming from an item; `castByItemID` (a one-off cast from using an item) is removable, since nothing recreates it. The change list also shows fatigue divided by 64, as the game does.
+
 Let the user see the poisons, diseases and harmful spells affecting the character, with what each one is doing to them, and cure any or all of them, the same way a temple, a Cure Disease / Cure Poison potion or a healing spell does in the game. Separate buttons restore health, magicka and fatigue to full.
 
 Sources: Daggerfall Unity source at `E:\Projects\daggerfall-unity` (checked against upstream `master` at `3d85a28`):
@@ -74,7 +76,7 @@ DFU uses *live* attributes, which include the `statMods` of active effects. Comp
 - Restore **health**, **magicka** and **fatigue**, each with its own button.
 - **Not** full vampirism or lycanthropy. Those also change race, globals (`TookTheCure`), guild memberships and quests; see the "Cure diseases, vampirism and lycanthropy" idea in [feature-ideas.md](feature-ideas.md). Their bundles are shown as read-only so the user knows the editor saw them.
 - **Not** helpful effects, potions or held magic items. Show a count of other active effects for context.
-- **Spells from items** (`fromEquippedItemID` or `castByItemID` set) are listed but not offered for removal: DFU recreates equipped-item effects, so removing one does nothing until the item is unequipped. Say so in the row.
+- **Spells from equipped items** (`fromEquippedItemID` set) are listed but not offered for removal: DFU recreates equipped-item effects, so removing one does nothing until the item is unequipped. Say so in the row.
 - **Mixed bundles:** a spell bundle can hold several effects. Offer removal only when every effect in it is harmful; otherwise list it as "contains helpful effects too" without a Cure button. Enemy spells in DFU are single-purpose classic spells, so this should be rare.
 
 ## Data safety

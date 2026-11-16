@@ -10,6 +10,7 @@ import { MainQuestProgress } from '../components/MainQuestProgress';
 import { FactionsAndReputation } from '../components/FactionsAndReputation';
 import { AllReputations } from '../components/AllReputations';
 import { LegalStanding } from '../components/LegalStanding';
+import { StatusEffects } from '../components/StatusEffects';
 import { LocationAndWorldData } from '../components/LocationAndWorldData';
 import { SaveBrowser } from '../components/SaveBrowser';
 import { ErrorBoundary } from '../components/errors/ErrorBoundary';
@@ -30,6 +31,7 @@ const SECTIONS = [
   { name: 'Factions & Reputation', Component: FactionsAndReputation },
   { name: 'All Faction Reputations', Component: AllReputations },
   { name: 'Crime & Legal Standing', Component: LegalStanding },
+  { name: 'Status Effects', Component: StatusEffects },
   { name: 'Main Quest Progress', Component: MainQuestProgress },
   { name: 'Quest Flags', Component: QuestProgress },
   { name: 'Location & World Data', Component: LocationAndWorldData },

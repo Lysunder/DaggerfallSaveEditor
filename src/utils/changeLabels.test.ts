@@ -63,3 +63,10 @@ describe('crime and law labels', () => {
       .toEqual({ section: 'Crime & Law', label: 'Wanted for', before: 'Theft', after: 'None' });
   });
 });
+
+describe('vitals labels', () => {
+  it('shows fatigue on the scale the game uses', () => {
+    expect(labelOf((d) => { (d.playerData.playerEntity as Record<string, unknown>).currentFatigue = 7040; }))
+      .toEqual({ section: 'Character', label: 'Current Fatigue', before: '(none)', after: '110' });
+  });
+});

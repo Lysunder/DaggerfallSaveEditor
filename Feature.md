@@ -55,6 +55,12 @@
 - **Legal Reputation**: See and edit your legal reputation in each region (-100 to 100), with the standing the game shows ("A scoundrel", "Admired"…). Regions you have no record in are hidden unless you turn on "Show all regions".
 - **Wanted For**: See or change the crime you're currently wanted for.
 
+### 🩹 Status Effects
+- **Cure Diseases and Poisons**: See every disease and poison the character has, with its stage and the attribute damage it's causing, and cure one or all of them, the same way a temple or cure potion does. The vampirism and lycanthropy infections (before they take hold) count as diseases.
+- **Remove Harmful Spells**: Paralysis, silence, attribute drains, transfers and damage-over-time spells cast by enemies can be removed one at a time or all at once. Effects that come from an equipped item, and spells that also have helpful effects, are left alone.
+- **Restore Vitals**: Separate buttons fill health, magicka and fatigue to their maximum, calculated the way the game does.
+- Full vampirism and lycanthropy are shown but can't be cured yet.
+
 ### 🗺️ Location & World Data
 - **Positioning**: Edit player world coordinates (X, Y, Z) and orientation (Yaw, Pitch).
 - **Environment Status**: Toggle whether the player is currently inside a dungeon, building, tavern, or residence.
@@ -71,6 +77,12 @@
 ---
 
 ## Changelog
+
+### Unreleased
+
+✨ **New Features & Improvements:**
+- **Status Effects**: Cure diseases and poisons, remove harmful spells such as paralysis and attribute drains, and restore health, magicka and fatigue, each with its own button.
+- **Change List**: Fatigue is shown on the same scale as the game (e.g. 110 instead of 7040).
 
 ### Version 1.0.10
 
