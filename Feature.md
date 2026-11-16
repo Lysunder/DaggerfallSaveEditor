@@ -78,7 +78,7 @@
 
 ## Changelog
 
-### Unreleased
+### Version 1.0.11
 
 ✨ **New Features & Improvements:**
 - **Status Effects**: Cure diseases and poisons, remove harmful spells such as paralysis and attribute drains, and restore health, magicka and fatigue, each with its own button.
