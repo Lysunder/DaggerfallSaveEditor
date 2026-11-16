@@ -14,7 +14,8 @@ Candidate features for the save editor, based on what Daggerfall Unity saves but
 
 - **Add item to inventory.** Planned in [add-inventory-item-plan.md](add-inventory-item-plan.md).
 - **Spellbook viewer and editor.** `spellbook[]` stores each custom spell's effects, cost settings and icon. Viewing, renaming and deleting are easy. Creating spells means porting DFU's effect definitions.
-- **Cure diseases, vampirism and lycanthropy.** These live in `instancedEffectBundles[]` as active effect bundles. It's a popular request, but lycanthropy and vampirism also touch race, globals (`TookTheCure`) and quests. Removing them cleanly needs research, like the main quest work did.
+- **Cure poisons and diseases.** Planned in [clear-status-effects-plan.md](clear-status-effects-plan.md). They're `Poison` and `Disease` bundles in `instancedEffectBundles`; curing is removing the bundle, as DFU's own cure does.
+- **Cure vampirism and lycanthropy.** The full curses are racial override effects that also touch race, globals (`TookTheCure`), guild memberships and quests. Removing them cleanly needs research, like the main quest work did. (The infection stage before it takes hold is a disease, covered by the plan above.)
 - **Journal viewer for all active quests.** The main quest panel already renders DFU journal text; reuse it for guild and side quests from `QuestData.txt`.
 - **Guild and Daedra timers.** `timeForThievesGuildLetter`, `timeForDarkBrotherhoodLetter` and `daedraSummonDay` control when those invitations and summonings become available. Moving them to "now" is a small but handy cheat.
 
