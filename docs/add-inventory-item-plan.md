@@ -1,6 +1,12 @@
 # Plan: Add an Item to the Inventory
 
-> **Status: not started.** None of the files named below exist yet, and `currentUID` is not in the save types.
+> **Status: not started** (checked against 1.0.10 and DFU `master` at `3d85a28`, November 2026). None of the files named below exist yet, and `currentUID` is not in the save types. The DFU facts this plan relies on still hold: 288 templates in `ItemTemplates.txt`, `currentUID` restored at `SaveLoadManager.cs` L1002, the `IsItemStackable` rules, the `ItemData_v1` fields, the 245/249 armor archives and `GetBodyMorphology`.
+>
+> Changes since the plan was written, to fold in when it's built:
+> - `GetBodyMorphology` throws for every race except the eight playable ones, so `None` (-1) and `Wereboar` (11) also need the Human fallback, not only Vampire (9) and Werewolf (10).
+> - Integer fields go through `clampInt` (`src/utils/numbers.ts`), as the inventory edit dialog already does.
+> - The inventory section has its own error boundary (`SECTIONS` in `Home.tsx`); the Add Item dialog should render inside it or get its own.
+> - The change list would show the `currentUID` bump as "Other: currentUID". Add a pattern in `changeLabels.ts` (or fold it into the item's "Added" row) so an added item reads as one change.
 
 Let the user add a new item to the character's inventory or wagon from the Inventory Management section. The flow starts with picking an item type, then the specific item, then only the options that matter for that type, then a preview before it's added.
 

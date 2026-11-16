@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Electron desktop app for editing **Daggerfall Unity** (DFU) save files (`SaveData.txt` and the sibling `FactionData.txt`, both JSON despite the `.txt` extension). Stack: Electron + React 19 + TypeScript + Vite + MUI + Zustand (with Immer middleware). Sample saves for manual testing live in `example/`, which is git-ignored and local only. Design notes and plans for larger features are in `docs/` (`feature-ideas.md` tracks what's done and what's next).
 
-The DFU source is the reference for save formats; the plans in `docs/` cite the relevant files.
+The DFU source is the reference for save formats; the plans in `docs/` cite the relevant files. The maintainer's local copy is at `E:\Projects\daggerfall-unity`; upstream is `github.com/Interkarma/daggerfall-unity` (use that when the local path isn't available, e.g. a sparse clone of `Assets/Scripts`).
 
 ## Commands
 
