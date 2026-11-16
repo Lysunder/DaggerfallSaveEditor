@@ -180,7 +180,8 @@ export const InventoryManager: React.FC = () => {
         </FormControl>
       </Stack>
 
-      <Box sx={{ flexGrow: 1 }}>
+      {/* minHeight 0 lets this flex child shrink to the panel, so the grid scrolls instead of overflowing. */}
+      <Box sx={{ flexGrow: 1, minHeight: 0 }}>
         <DataGrid
           rows={filteredItems}
           columns={columns}

@@ -84,6 +84,9 @@
 - **Status Effects**: Cure diseases and poisons, remove harmful spells such as paralysis and attribute drains, and restore health, magicka and fatigue, each with its own button.
 - **Change List**: Fatigue is shown on the same scale as the game (e.g. 110 instead of 7040).
 
+🐛 **Bug Fixes:**
+- **Inventory Table**: With many items, or 25 or 50 rows per page, the inventory table spilled out of the bottom of its panel and pushed the page controls out of view. It now stays inside the panel and scrolls.
+
 ### Version 1.0.10
 
 ✨ **New Features & Improvements:**
