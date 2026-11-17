@@ -26,6 +26,12 @@
 - **Skills**: Directly edit the mastery level of all Primary, Major, and Minor skills (Weapon skills, Magic schools, utility skills like Stealth and Climbing, and languages).
 - **Level Progress**: View exact skill increases required to reach the next character level, dynamically calculated from your current skills.
 
+### 🩹 Status Effects
+- **Cure Diseases and Poisons**: See every disease and poison the character has, with its stage and the attribute damage it's causing, and cure one or all of them, the same way a temple or cure potion does. The vampirism and lycanthropy infections (before they take hold) count as diseases.
+- **Remove Harmful Spells**: Paralysis, silence, attribute drains, transfers and damage-over-time spells cast by enemies can be removed one at a time or all at once. Effects that come from an equipped item, and spells that also have helpful effects, are left alone.
+- **Restore Vitals**: Separate buttons fill health, magicka and fatigue to their maximum, calculated the way the game does.
+- Full vampirism and lycanthropy are shown but can't be cured yet.
+
 ### 🛡️ Career & Advantages
 - **Special Abilities**: Toggle advantages/disadvantages such as Acute Hearing, Athleticism, Adrenaline Rush, Damage from Sunlight/Holy Places, and No Regen Spell Points.
 - **Tolerances & Immunities**: Modify character tolerances (Normal, Immune, Resistant, Low Tolerance, Critical Weakness) for Paralysis, Magic, Poison, Fire, Frost, Shock, and Disease.
@@ -36,6 +42,7 @@
 ### 🎒 Inventory & Items
 - **Inventory Management**: View and edit items currently in your character's personal inventory.
 - **Wagon Management**: View and edit items stored in your wagon.
+- **Add Items**: Add weapons, armor and shields, clothing, ingredients, gems, jewellery, religious items and miscellaneous items (torches, oil, maps…) to the inventory or wagon. Pick a type, then the item, then its material, style or dye; weight, value and condition are worked out the same way Daggerfall Unity makes the item. Ingredients, gems, arrows and oil can be added as a stack. Books, potions, magic items, artifacts and quest items can't be added.
 - **Item Editing**: Modify an item's condition and maximum condition, stack count, value and weight.
 - **Quick Repair**: "Repair All Items" functionality to instantly restore all items to maximum condition.
 - **Item Removal**: Delete specific items from your inventory or wagon.
@@ -71,6 +78,16 @@
 ---
 
 ## Changelog
+
+### Version 1.0.11
+
+✨ **New Features & Improvements:**
+- **Status Effects**: Cure diseases and poisons, remove harmful spells such as paralysis and attribute drains, and restore health, magicka and fatigue, each with its own button.
+- **Add Items**: Add new items to the inventory or wagon: weapons, armor, clothing, ingredients, gems, jewellery, religious and miscellaneous items, with material, style and dye where they apply.
+- **Change List**: Fatigue is shown on the same scale as the game (e.g. 110 instead of 7040).
+
+🐛 **Bug Fixes:**
+- **Inventory Table**: With many items, or 25 or 50 rows per page, the inventory table spilled out of the bottom of its panel and pushed the page controls out of view. It now stays inside the panel and scrolls.
 
 ### Version 1.0.10
 

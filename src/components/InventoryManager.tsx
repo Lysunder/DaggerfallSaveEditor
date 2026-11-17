@@ -9,6 +9,8 @@ import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import BuildIcon from '@mui/icons-material/Build';
+import AddIcon from '@mui/icons-material/Add';
+import { AddItemDialog } from './AddItemDialog';
 import { clampInt } from '../utils/numbers';
 import { useSaveStore } from '../store/useSaveStore';
 import type { Item } from '../store/useSaveStore';
@@ -30,6 +32,7 @@ export const InventoryManager: React.FC = () => {
   // Modals state
   const [editItem, setEditItem] = useState<Item | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
 
   const playerEntity = saveData?.playerData?.playerEntity;
   const isInventory = tabIndex === 0;
@@ -151,13 +154,14 @@ export const InventoryManager: React.FC = () => {
           <Tab label="Inventory" />
           <Tab label="Wagon" />
         </Tabs>
-        <Button 
-          variant="outlined" 
-          startIcon={<BuildIcon />} 
-          onClick={handleRepairAll}
-        >
-          Repair All Items
-        </Button>
+        <Stack direction="row" spacing={1}>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setAddOpen(true)}>
+            Add Item
+          </Button>
+          <Button variant="outlined" startIcon={<BuildIcon />} onClick={handleRepairAll}>
+            Repair All Items
+          </Button>
+        </Stack>
       </Box>
 
       <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
@@ -180,7 +184,8 @@ export const InventoryManager: React.FC = () => {
         </FormControl>
       </Stack>
 
-      <Box sx={{ flexGrow: 1 }}>
+      {/* minHeight 0 lets this flex child shrink to the panel, so the grid scrolls instead of overflowing. */}
+      <Box sx={{ flexGrow: 1, minHeight: 0 }}>
         <DataGrid
           rows={filteredItems}
           columns={columns}
@@ -193,6 +198,8 @@ export const InventoryManager: React.FC = () => {
           density="compact"
         />
       </Box>
+
+      {addOpen && <AddItemDialog onClose={() => setAddOpen(false)} defaultTarget={isInventory ? 'items' : 'wagonItems'} />}
 
       {/* Delete Dialog */}
       <Dialog open={deleteItemId !== null} onClose={() => setDeleteItemId(null)}>

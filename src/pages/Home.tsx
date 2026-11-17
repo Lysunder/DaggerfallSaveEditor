@@ -10,6 +10,7 @@ import { MainQuestProgress } from '../components/MainQuestProgress';
 import { FactionsAndReputation } from '../components/FactionsAndReputation';
 import { AllReputations } from '../components/AllReputations';
 import { LegalStanding } from '../components/LegalStanding';
+import { StatusEffects } from '../components/StatusEffects';
 import { LocationAndWorldData } from '../components/LocationAndWorldData';
 import { SaveBrowser } from '../components/SaveBrowser';
 import { ErrorBoundary } from '../components/errors/ErrorBoundary';
@@ -23,6 +24,7 @@ const StatsAndSkillsSection = () => (
 
 const SECTIONS = [
   { name: 'Character Basics', Component: CharacterBasics },
+  { name: 'Status Effects', Component: StatusEffects },
   { name: 'Career & Advantages', Component: CareerAndAdvantages },
   { name: 'Stats & Skills', Component: StatsAndSkillsSection },
   { name: 'Inventory', Component: InventoryManager },

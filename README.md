@@ -8,6 +8,8 @@ A desktop application for editing save files from The Elder Scrolls II: Daggerfa
 - Edit character stats, skill levels, and attributes
 - Reassign Primary, Major, and Minor class skills
 - Modify inventory and wagon items, gold, and bank accounts
+- Add new weapons, armor, clothing, ingredients and other items, built the way the game makes them
+- Cure diseases, poisons and harmful spells, and restore health, magicka and fatigue
 - Toggle quest global variables and view main quest progress
 - Change faction reputations and guild ranks
 - Clear bounties and banishments, and edit each region's legal reputation

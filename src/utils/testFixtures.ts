@@ -40,3 +40,20 @@ export type TestSave = ReturnType<typeof makeSave>;
 export const makeFactions = (count = 500) => ({
   factionDict: Array.from({ length: count }, (_, i) => ({ Key: i, Value: { id: i, name: `Faction ${i}`, rep: 0 } })),
 });
+
+/** instancedEffectBundles covering each kind the Status Effects section handles. */
+export const makeEffectBundles = () => {
+  const mods = (values: Record<number, number>) => Array.from({ length: 8 }, (_, i) => values[i] ?? 0);
+  const type = 'DaggerfallWorkshop.Game.MagicAndEffects.MagicEffects';
+  return [
+    { bundleType: 'Disease', name: 'Witches Pox', liveEffects: [{ key: 'Disease-WitchesPox', statMods: mods({ 0: -6, 4: -3 }), effectSpecific: { $type: `${type}.DiseaseEffect+SaveData_v1`, incubationOver: true, daysOfSymptomsLeft: 0xfe } }] },
+    { bundleType: 'Disease', liveEffects: [{ key: 'Vampirism-Infection', statMods: mods({}), effectSpecific: { incubationOver: false, daysOfSymptomsLeft: 3 } }] },
+    { bundleType: 3, liveEffects: [{ key: 'Poison-Nux_Vomica', statMods: mods({ 4: -1 }), effectSpecific: { currentState: 'Active' } }] },
+    { bundleType: 'Spell', casterEntityType: 'EnemyClass', liveEffects: [{ key: 'Drain-Strength', roundsRemaining: 1, statMods: mods({ 0: -10 }) }] },
+    { bundleType: 'Spell', casterEntityType: 'EnemyMonster', liveEffects: [{ key: 'Paralyze', roundsRemaining: 3, statMods: mods({}) }] },
+    { bundleType: 'Spell', fromEquippedItemID: 42, liveEffects: [{ key: 'Silence', roundsRemaining: 0, statMods: mods({}) }] },
+    { bundleType: 'None', liveEffects: [{ key: 'Vampirism-Curse', statMods: mods({}) }] },
+    { bundleType: 'Spell', casterEntityType: 'Player', liveEffects: [{ key: 'Shield', roundsRemaining: 10, statMods: mods({}) }] },
+    { bundleType: 'Potion', liveEffects: [{ key: 'Fortify-Strength', roundsRemaining: 5, statMods: mods({ 0: 5 }) }] },
+  ];
+};

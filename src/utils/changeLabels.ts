@@ -2,6 +2,7 @@
 import { REGION_NAMES } from '../data/regions';
 import { guildName } from '../data/guilds';
 import { crimeLabel, crimeName, punishmentLabel } from '../data/legal';
+import { describeAffliction, type EffectBundle } from '../data/statusEffects';
 import { formatGameTime } from './daggerfallDate';
 import { propertyPath, type Change } from './saveDiff';
 
@@ -28,7 +29,7 @@ export interface ChangeLabel {
 
 export const SECTION_ORDER = [
   'Character', 'Career & Advantages', 'Stats & Skills', 'Inventory', 'Wagon', 'Finances',
-  'Factions & Reputation', 'Crime & Law', 'Quest Flags', 'Location & Time', 'Other',
+  'Factions & Reputation', 'Crime & Law', 'Status Effects', 'Quest Flags', 'Location & Time', 'Other',
 ];
 
 const ITEM_FIELDS: Record<string, string> = {
@@ -129,6 +130,22 @@ export const labelChange = (change: Change, context: LabelContext = {}): ChangeL
     }
     const what = field === 'LegalRep' ? 'legal reputation' : spacedName(field);
     return { section: 'Crime & Law', label: `${regionName} – ${what}`, ...values };
+  }
+  if (path === `${entity}instancedEffectBundles` && Array.isArray(change.before) && Array.isArray(change.after)) {
+    // Bundles that weren't touched keep their identity (Immer), so what's missing from after was removed.
+    const kept = new Set(change.after);
+    const removed = (change.before as EffectBundle[])
+      .map((bundle, index) => (kept.has(bundle) ? null : describeAffliction(bundle, index)?.name ?? 'an effect'))
+      .filter((name): name is string => name !== null);
+    if (removed.length > 0) {
+      return { section: 'Status Effects', label: `Cured: ${removed.join(', ')}`, before: '', after: '' };
+    }
+    return { section: 'Status Effects', label: 'Active effects', ...values };
+  }
+  if (path === `${entity}currentFatigue`) {
+    // Saved 64 times larger than the game shows it (DaggerfallEntity.FatigueMultiplier).
+    const format = (value: unknown) => (typeof value === 'number' ? String(Math.floor(value / 64)) : formatValue(value));
+    return { section: 'Character', label: 'Current Fatigue', before: format(change.before), after: format(change.after) };
   }
   if (path === `${entity}crimeCommitted`) {
     const format = (value: unknown) => { const name = crimeName(value); return name ? crimeLabel(name) : formatValue(value); };
