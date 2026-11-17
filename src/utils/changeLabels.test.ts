@@ -48,8 +48,8 @@ describe('labelChange', () => {
   it('labels removed records and falls back to the raw path', () => {
     expect(labelOf((d) => { d.playerData.playerEntity.items.splice(0, 1); }))
       .toMatchObject({ section: 'Inventory', label: 'Removed: Dagger' });
-    expect(labelOf((d) => { d.currentUID = 101; }))
-      .toEqual({ section: 'Other', label: 'currentUID', before: '100', after: '101' });
+    expect(labelOf((d) => { d.dateAndTime = { gameTime: 12617127056, unknownField: 1 } as typeof d.dateAndTime; }))
+      .toEqual({ section: 'Other', label: 'dateAndTime.unknownField', before: '(none)', after: '1' });
   });
 });
 

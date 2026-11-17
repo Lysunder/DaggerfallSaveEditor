@@ -43,6 +43,13 @@ const KEYED_ARRAYS: Record<SaveFile, Record<string, string>> = {
 
 const EQUIP_TABLE = 'playerData.playerEntity.equipTable';
 
+/**
+ * Top-level save properties left out of the diff. currentUID is DFU's ID counter: adding an item
+ * moves it on, and the added item already shows as one change. Reverting the item leaves the counter
+ * ahead, which is harmless, while reverting the counter alone could hand an ID out twice.
+ */
+const IGNORED_SAVE_PROPERTIES = new Set(['currentUID']);
+
 /** Dotted path of property names only, used to look up keyed arrays and label patterns. */
 export const propertyPath = (path: PathSegment[]) =>
   path.filter((segment): segment is string => typeof segment === 'string').join('.');
@@ -148,7 +155,7 @@ export const diffSave = (before: unknown, after: unknown): Change[] => {
   if (before === after || !before || !after) return [];
   const out: Change[] = [];
   walk(before, after, [], 'save', undefined, out);
-  return foldEquipmentSlots(out);
+  return foldEquipmentSlots(out.filter((change) => !IGNORED_SAVE_PROPERTIES.has(change.path[0] as string)));
 };
 
 export const diffFaction = (before: unknown, after: unknown): Change[] => {

@@ -1,12 +1,12 @@
 # Plan: Add an Item to the Inventory
 
-> **Status: not started** (checked against 1.0.10 and DFU `master` at `3d85a28`, November 2026). None of the files named below exist yet, and `currentUID` is not in the save types. The DFU facts this plan relies on still hold: 288 templates in `ItemTemplates.txt`, `currentUID` restored at `SaveLoadManager.cs` L1002, the `IsItemStackable` rules, the `ItemData_v1` fields, the 245/249 armor archives and `GetBodyMorphology`.
->
-> Changes since the plan was written, to fold in when it's built:
-> - `GetBodyMorphology` throws for every race except the eight playable ones, so `None` (-1) and `Wereboar` (11) also need the Human fallback, not only Vampire (9) and Werewolf (10).
-> - Integer fields go through `clampInt` (`src/utils/numbers.ts`), as the inventory edit dialog already does.
-> - The inventory section has its own error boundary (`SECTIONS` in `Home.tsx`); the Add Item dialog should render inside it or get its own.
-> - The change list would show the `currentUID` bump as "Other: currentUID". Add a pattern in `changeLabels.ts` (or fold it into the item's "Added" row) so an added item reads as one change.
+> **Status: done** (built for 1.0.11 against DFU `master` at `2343305d1`, November 2026). Implemented in `scripts/generate-item-data.mjs` → `src/data/itemTemplates.ts`, `src/utils/itemBuilder.ts` (tests in `itemBuilder.test.ts`), the store's `addItems`, and `src/components/AddItemDialog.tsx`. Differences from the plan below:
+> - DFU changed the leather armor weight formula in 2025 (`7d38e7f2`: `Mathf.Round((int)(w * 4) / 2) / 4`, integer division), so leather gauntlets now weigh 0.5 kg, not the 0.625 kg in older saves. The builder follows current DFU.
+> - `currentUID` is left out of the unsaved-changes diff (`IGNORED_SAVE_PROPERTIES` in `saveDiff.ts`), so an added item is one "Added" change and reverting it leaves nothing unsaved.
+> - Gems are ingredients in DFU's templates, so they stack too. Non-stackable items can be added as up to 20 separate copies; stacks go up to 999.
+> - Letters of credit, potion recipes, dead bodies, deeds and the unused MiscItems slot are left out of Miscellaneous. Ingredients and maps that appear in two groups are listed once, in their first group.
+> - Variants are shown as "Style 1…n", limited to the ones `SetVariant` allows for the piece and material. Unsupported races (None, Vampire, Werewolf, Wereboar) use the Human body offset with a warning on the review step.
+> - The wagon needs a small cart (`Transportation` group index 0) in the inventory, as in DFU.
 
 Let the user add a new item to the character's inventory or wagon from the Inventory Management section. The flow starts with picking an item type, then the specific item, then only the options that matter for that type, then a preview before it's added.
 

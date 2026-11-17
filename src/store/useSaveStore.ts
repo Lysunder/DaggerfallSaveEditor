@@ -9,6 +9,7 @@ import {
   findAfflictions, instancedBundles, maxVitals, referencedIdsWithin, type AfflictionKind, type EffectBundle,
 } from '../data/statusEffects';
 import { clampInt } from '../utils/numbers';
+import type { NewItemData } from '../utils/itemBuilder';
 
 interface Stats {
   Strength: number;
@@ -195,6 +196,8 @@ interface SaveGameData {
     saveName: string;
     playTime: number;
   };
+  /** DFU's next free ID for items and other objects; restored on load (SaveLoadManager). */
+  currentUID?: number;
   playerData: {
     playerEntity: PlayerEntity;
     playerPosition?: {
@@ -326,6 +329,8 @@ interface SaveStore {
   updateWagonItem: (uid: number, updates: Partial<Item>) => void;
   deleteWagonItem: (uid: number) => void;
   repairAllItems: (target: 'items' | 'wagonItems') => void;
+  /** Adds new items (built by src/utils/itemBuilder.ts) with fresh IDs; returns the IDs given. */
+  addItems: (target: 'items' | 'wagonItems', items: NewItemData[]) => number[];
   updateGlobalVar: (name: string, value: boolean) => void;
   updateBankAccount: (regionIndex: number, updates: Partial<BankAccount>) => void;
   updateGuildRank: (factionId: number, newRank: number) => void;
@@ -476,6 +481,30 @@ export const useSaveStore = create<SaveStore>()(
           });
         }
       }),
+
+    addItems: (target, newItems) => {
+      const assigned: number[] = [];
+      set((state) => {
+        const saveData = state.saveData;
+        const playerEntity = saveData?.playerData?.playerEntity;
+        if (!saveData || !playerEntity) return;
+        // Take IDs from DFU's counter, as DaggerfallUnity.NextUID does, and move the counter past
+        // them so the game doesn't hand the same ID to the next item it creates.
+        const used = new Set([...(playerEntity.items ?? []), ...(playerEntity.wagonItems ?? [])].map((item) => item.uid));
+        // Without a usable counter, start after the highest item ID.
+        let next = Number.isSafeInteger(saveData.currentUID) ? saveData.currentUID! : Math.max(0, ...used) + 1;
+        const list = (playerEntity[target] ??= []);
+        for (const item of newItems) {
+          while (used.has(next)) next += 1;
+          used.add(next);
+          list.push({ uid: next, ...item } as Item);
+          assigned.push(next);
+          next += 1;
+        }
+        saveData.currentUID = next;
+      });
+      return assigned;
+    },
 
     updateGlobalVar: (name, value) =>
       set((state) => {

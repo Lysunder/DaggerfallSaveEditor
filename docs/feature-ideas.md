@@ -12,7 +12,7 @@ Candidate features for the save editor, based on what Daggerfall Unity saves but
 
 ## Medium: needs DFU data or careful handling
 
-- **Add item to inventory.** Planned in [add-inventory-item-plan.md](add-inventory-item-plan.md).
+- ✅ **Add item to inventory.** *Built on `features`, not yet released* ([plan](add-inventory-item-plan.md)).
 - **Spellbook viewer and editor.** `spellbook[]` stores each custom spell's effects, cost settings and icon. Viewing, renaming and deleting are easy. Creating spells means porting DFU's effect definitions.
 - ✅ **Cure poisons, diseases and harmful spells, and restore vitals.** *Built on `features`, not yet released.* Planned in [clear-status-effects-plan.md](clear-status-effects-plan.md). They're bundles in `instancedEffectBundles`; curing is removing the bundle, as DFU's own cure does. Separate buttons restore health, magicka and fatigue.
 - **Cure vampirism and lycanthropy.** The full curses are racial override effects that also touch race, globals (`TookTheCure`), guild memberships and quests. Removing them cleanly needs research, like the main quest work did. (The infection stage before it takes hold is a disease, covered by the plan above.)
@@ -25,10 +25,10 @@ Candidate features for the save editor, based on what Daggerfall Unity saves but
 - ✅ **Unsaved-changes indicator and change list.** *Done in 1.0.8* ([plan](unsaved-changes-plan.md)), with per-change revert. The whole file is rewritten on every save, so a list of what changed before writing, plus a warning when closing with unsaved edits, would build trust.
 - ✅ **Error reports.** *Done in 1.0.10.* Errors show a copyable report instead of a blank window; window crashes and freezes get a native dialog.
 - **Restore from backup.** Every save already makes a `bak_SaveData.N.txt`. A menu to list and restore them makes that safety net usable.
-- **Automated tests.** Vitest is set up (`npm test`, run in CI) and covers the save locations, date helpers, enum handling, guild data, legal standing, numeric limits, error reports, the store, and the unsaved-changes diff, labels and revert. Still untested: `mainQuestProgress.ts` and the planned item builder. Both are pure functions that are easy to test, and the DFU-built items in a real save make ready-made test data.
+- **Automated tests.** Vitest is set up (`npm test`, run in CI) and covers the save locations, date helpers, enum handling, guild data, legal standing, numeric limits, error reports, the store, and the unsaved-changes diff, labels and revert. The item builder is checked against DFU-built items from a real save. Still untested: `mainQuestProgress.ts`, a pure function that's easy to test.
 
 ## Suggested order
 
 1. ~~**Clear bounties:** high demand, simple data.~~ Done.
-2. **Add item:** already planned.
+2. ~~**Add item:** already planned.~~ Built.
 3. ~~**Save slot browser:** improves every session.~~ Done.

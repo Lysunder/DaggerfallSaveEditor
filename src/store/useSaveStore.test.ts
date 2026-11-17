@@ -3,6 +3,7 @@ import { useSaveStore } from './useSaveStore';
 import { diffAll } from '../utils/saveDiff';
 import { makeEffectBundles, makeSave } from '../utils/testFixtures';
 import { labelChange } from '../utils/changeLabels';
+import { createItem } from '../utils/itemBuilder';
 
 const store = () => useSaveStore.getState();
 const load = (filePath: string) =>
@@ -132,5 +133,36 @@ describe('status effects', () => {
     entity = store().saveData!.playerData.playerEntity;
     // Live INT 40 → 80 magicka. Live STR 50−6−10+5 = 39, END 40−3−1 = 36 → (39+36)×64.
     expect([entity.currentMagicka, entity.currentFatigue]).toEqual([80, 75 * 64]);
+  });
+});
+
+describe('adding items', () => {
+  it('takes IDs from currentUID, skips IDs in use and moves the counter past them', () => {
+    load('A/SaveData.txt');
+    useSaveStore.setState((state) => {
+      state.saveData!.currentUID = 2; // stale counter that points at existing items
+    });
+    const ids = store().addItems('items', [createItem('Gems', 0), createItem('Gems', 1)]);
+    expect(ids).toEqual([4, 5]);
+    expect(store().saveData!.currentUID).toBe(6);
+    expect(store().saveData!.playerData.playerEntity.items.map((item) => item.uid)).toEqual([1, 2, 3, 4, 5]);
+  });
+
+  it('adds to the wagon and starts at the save counter', () => {
+    load('A/SaveData.txt');
+    expect(store().addItems('wagonItems', [createItem('Gems', 0)])).toEqual([100]);
+    expect(store().saveData!.playerData.playerEntity.wagonItems).toHaveLength(1);
+    expect(store().saveData!.currentUID).toBe(101);
+  });
+
+  it('shows one change per added item, not the counter, and reverting it leaves nothing unsaved', () => {
+    load('A/SaveData.txt');
+    store().addItems('items', [createItem('Gems', 0)]);
+    const changes = unsaved();
+    expect(changes.map((change) => labelChange(change))).toEqual([
+      { section: 'Inventory', label: 'Added: Ruby', before: '', after: '' },
+    ]);
+    store().revertChange(changes[0]);
+    expect(unsaved()).toEqual([]);
   });
 });

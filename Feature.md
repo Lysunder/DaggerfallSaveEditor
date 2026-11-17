@@ -42,6 +42,7 @@
 ### 🎒 Inventory & Items
 - **Inventory Management**: View and edit items currently in your character's personal inventory.
 - **Wagon Management**: View and edit items stored in your wagon.
+- **Add Items**: Add weapons, armor and shields, clothing, ingredients, gems, jewellery, religious items and miscellaneous items (torches, oil, maps…) to the inventory or wagon. Pick a type, then the item, then its material, style or dye; weight, value and condition are worked out the same way Daggerfall Unity makes the item. Ingredients, gems, arrows and oil can be added as a stack. Books, potions, magic items, artifacts and quest items can't be added.
 - **Item Editing**: Modify an item's condition and maximum condition, stack count, value and weight.
 - **Quick Repair**: "Repair All Items" functionality to instantly restore all items to maximum condition.
 - **Item Removal**: Delete specific items from your inventory or wagon.
@@ -82,6 +83,7 @@
 
 ✨ **New Features & Improvements:**
 - **Status Effects**: Cure diseases and poisons, remove harmful spells such as paralysis and attribute drains, and restore health, magicka and fatigue, each with its own button.
+- **Add Items**: Add new items to the inventory or wagon: weapons, armor, clothing, ingredients, gems, jewellery, religious and miscellaneous items, with material, style and dye where they apply.
 - **Change List**: Fatigue is shown on the same scale as the game (e.g. 110 instead of 7040).
 
 🐛 **Bug Fixes:**
