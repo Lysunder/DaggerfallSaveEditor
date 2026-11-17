@@ -24,6 +24,7 @@ const StatsAndSkillsSection = () => (
 
 const SECTIONS = [
   { name: 'Character Basics', Component: CharacterBasics },
+  { name: 'Status Effects', Component: StatusEffects },
   { name: 'Career & Advantages', Component: CareerAndAdvantages },
   { name: 'Stats & Skills', Component: StatsAndSkillsSection },
   { name: 'Inventory', Component: InventoryManager },
@@ -31,7 +32,6 @@ const SECTIONS = [
   { name: 'Factions & Reputation', Component: FactionsAndReputation },
   { name: 'All Faction Reputations', Component: AllReputations },
   { name: 'Crime & Legal Standing', Component: LegalStanding },
-  { name: 'Status Effects', Component: StatusEffects },
   { name: 'Main Quest Progress', Component: MainQuestProgress },
   { name: 'Quest Flags', Component: QuestProgress },
   { name: 'Location & World Data', Component: LocationAndWorldData },

@@ -26,6 +26,12 @@
 - **Skills**: Directly edit the mastery level of all Primary, Major, and Minor skills (Weapon skills, Magic schools, utility skills like Stealth and Climbing, and languages).
 - **Level Progress**: View exact skill increases required to reach the next character level, dynamically calculated from your current skills.
 
+### 🩹 Status Effects
+- **Cure Diseases and Poisons**: See every disease and poison the character has, with its stage and the attribute damage it's causing, and cure one or all of them, the same way a temple or cure potion does. The vampirism and lycanthropy infections (before they take hold) count as diseases.
+- **Remove Harmful Spells**: Paralysis, silence, attribute drains, transfers and damage-over-time spells cast by enemies can be removed one at a time or all at once. Effects that come from an equipped item, and spells that also have helpful effects, are left alone.
+- **Restore Vitals**: Separate buttons fill health, magicka and fatigue to their maximum, calculated the way the game does.
+- Full vampirism and lycanthropy are shown but can't be cured yet.
+
 ### 🛡️ Career & Advantages
 - **Special Abilities**: Toggle advantages/disadvantages such as Acute Hearing, Athleticism, Adrenaline Rush, Damage from Sunlight/Holy Places, and No Regen Spell Points.
 - **Tolerances & Immunities**: Modify character tolerances (Normal, Immune, Resistant, Low Tolerance, Critical Weakness) for Paralysis, Magic, Poison, Fire, Frost, Shock, and Disease.
@@ -54,12 +60,6 @@
 - **Clear All Bounties**: One click resets every negative regional legal reputation to 0, lifts banishments and death sentences, and clears the crime the guards are after you for. Positive reputations are kept.
 - **Legal Reputation**: See and edit your legal reputation in each region (-100 to 100), with the standing the game shows ("A scoundrel", "Admired"…). Regions you have no record in are hidden unless you turn on "Show all regions".
 - **Wanted For**: See or change the crime you're currently wanted for.
-
-### 🩹 Status Effects
-- **Cure Diseases and Poisons**: See every disease and poison the character has, with its stage and the attribute damage it's causing, and cure one or all of them, the same way a temple or cure potion does. The vampirism and lycanthropy infections (before they take hold) count as diseases.
-- **Remove Harmful Spells**: Paralysis, silence, attribute drains, transfers and damage-over-time spells cast by enemies can be removed one at a time or all at once. Effects that come from an equipped item, and spells that also have helpful effects, are left alone.
-- **Restore Vitals**: Separate buttons fill health, magicka and fatigue to their maximum, calculated the way the game does.
-- Full vampirism and lycanthropy are shown but can't be cured yet.
 
 ### 🗺️ Location & World Data
 - **Positioning**: Edit player world coordinates (X, Y, Z) and orientation (Yaw, Pitch).
